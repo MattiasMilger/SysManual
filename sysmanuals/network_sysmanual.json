@@ -12,42 +12,40 @@
       "name": "Common Ports",
       "entries": [
         {
-          "id": "http",
-          "name": "HTTP",
-          "description": "Hypertext Transfer Protocol",
+          "id": "ftp-data",
+          "name": "FTP Data (20)",
+          "description": "FTP Data Transfer",
           "content": {
-            "Port": "80",
+            "Port": "20",
             "Protocol": "TCP",
-            "Purpose": "Web traffic (unencrypted)",
-            "Service": "Web servers"
+            "Purpose": "FTP data transfer (active mode)",
+            "Service": "FTP server"
           },
           "examples": [
-            "curl http://example.com:80",
-            "telnet example.com 80",
-            "netstat -an | grep :80"
+            "netstat -an | grep :20"
           ],
-          "notes": "Standard port for unencrypted web traffic"
+          "notes": "Used for FTP active mode data transfers"
         },
         {
-          "id": "https",
-          "name": "HTTPS",
-          "description": "HTTP Secure",
+          "id": "ftp",
+          "name": "FTP (21)",
+          "description": "File Transfer Protocol Control",
           "content": {
-            "Port": "443",
+            "Port": "21",
             "Protocol": "TCP",
-            "Purpose": "Encrypted web traffic",
-            "Service": "Secure web servers"
+            "Purpose": "FTP command/control",
+            "Service": "FTP server"
           },
           "examples": [
-            "curl https://example.com:443",
-            "openssl s_client -connect example.com:443",
-            "netstat -an | grep :443"
+            "ftp ftp.example.com",
+            "telnet example.com 21",
+            "netstat -an | grep :21"
           ],
-          "notes": "Encrypted web traffic using TLS/SSL"
+          "notes": "WARNING: Insecure - credentials sent in plain text"
         },
         {
           "id": "ssh",
-          "name": "SSH",
+          "name": "SSH (22)",
           "description": "Secure Shell",
           "content": {
             "Port": "22",
@@ -63,28 +61,27 @@
           "notes": "Default port for SSH connections"
         },
         {
-          "id": "ftp",
-          "name": "FTP",
-          "description": "File Transfer Protocol",
+          "id": "telnet",
+          "name": "Telnet (23)",
+          "description": "Telnet Protocol",
           "content": {
-            "Port": "21 (control), 20 (data)",
+            "Port": "23",
             "Protocol": "TCP",
-            "Purpose": "File transfer",
-            "Service": "FTP server"
+            "Purpose": "Unencrypted remote access",
+            "Service": "Telnet server"
           },
           "examples": [
-            "ftp ftp.example.com",
-            "telnet example.com 21",
-            "netstat -an | grep :21"
+            "telnet hostname 23",
+            "netstat -an | grep :23"
           ],
-          "notes": "WARNING: Insecure - credentials sent in plain text"
+          "notes": "WARNING: Insecure - all data sent in plain text. Use SSH instead"
         },
         {
           "id": "smtp",
-          "name": "SMTP",
+          "name": "SMTP (25)",
           "description": "Simple Mail Transfer Protocol",
           "content": {
-            "Port": "25 (unencrypted), 587 (TLS), 465 (SSL)",
+            "Port": "25",
             "Protocol": "TCP",
             "Purpose": "Email transmission",
             "Service": "Mail server"
@@ -92,13 +89,13 @@
           "examples": [
             "telnet smtp.example.com 25",
             "netstat -an | grep :25",
-            "nc smtp.example.com 587"
+            "nc smtp.example.com 25"
           ],
-          "notes": "Port 587 preferred for mail submission"
+          "notes": "Standard SMTP port, often blocked by ISPs to prevent spam"
         },
         {
           "id": "dns",
-          "name": "DNS",
+          "name": "DNS (53)",
           "description": "Domain Name System",
           "content": {
             "Port": "53",
@@ -114,8 +111,250 @@
           "notes": "Translates domain names to IP addresses"
         },
         {
+          "id": "dhcp",
+          "name": "DHCP (67/68)",
+          "description": "Dynamic Host Configuration Protocol",
+          "content": {
+            "Port": "67 (server), 68 (client)",
+            "Protocol": "UDP",
+            "Purpose": "Automatic IP address assignment",
+            "Service": "DHCP server"
+          },
+          "examples": [
+            "sudo dhclient eth0",
+            "netstat -an | grep :67"
+          ],
+          "notes": "Server uses port 67, clients use port 68"
+        },
+        {
+          "id": "http",
+          "name": "HTTP (80)",
+          "description": "Hypertext Transfer Protocol",
+          "content": {
+            "Port": "80",
+            "Protocol": "TCP",
+            "Purpose": "Web traffic (unencrypted)",
+            "Service": "Web servers"
+          },
+          "examples": [
+            "curl http://example.com:80",
+            "telnet example.com 80",
+            "netstat -an | grep :80"
+          ],
+          "notes": "Standard port for unencrypted web traffic"
+        },
+        {
+          "id": "pop3",
+          "name": "POP3 (110)",
+          "description": "Post Office Protocol v3",
+          "content": {
+            "Port": "110",
+            "Protocol": "TCP",
+            "Purpose": "Email retrieval",
+            "Service": "Mail server"
+          },
+          "examples": [
+            "telnet mail.example.com 110",
+            "netstat -an | grep :110"
+          ],
+          "notes": "Downloads emails from server to client"
+        },
+        {
+          "id": "ntp",
+          "name": "NTP (123)",
+          "description": "Network Time Protocol",
+          "content": {
+            "Port": "123",
+            "Protocol": "UDP",
+            "Purpose": "Time synchronization",
+            "Service": "NTP server"
+          },
+          "examples": [
+            "ntpdate pool.ntp.org",
+            "netstat -an | grep :123"
+          ],
+          "notes": "Synchronizes system clocks across networks"
+        },
+        {
+          "id": "imap",
+          "name": "IMAP (143)",
+          "description": "Internet Message Access Protocol",
+          "content": {
+            "Port": "143",
+            "Protocol": "TCP",
+            "Purpose": "Email access and management",
+            "Service": "Mail server"
+          },
+          "examples": [
+            "telnet mail.example.com 143",
+            "netstat -an | grep :143"
+          ],
+          "notes": "Manages emails on server, more flexible than POP3"
+        },
+        {
+          "id": "snmp",
+          "name": "SNMP (161/162)",
+          "description": "Simple Network Management Protocol",
+          "content": {
+            "Port": "161 (agent), 162 (trap)",
+            "Protocol": "UDP",
+            "Purpose": "Network device monitoring",
+            "Service": "SNMP agent"
+          },
+          "examples": [
+            "snmpwalk -v2c -c public hostname",
+            "netstat -an | grep :161"
+          ],
+          "notes": "Used for monitoring and managing network devices"
+        },
+        {
+          "id": "ldap",
+          "name": "LDAP (389)",
+          "description": "Lightweight Directory Access Protocol",
+          "content": {
+            "Port": "389",
+            "Protocol": "TCP/UDP",
+            "Purpose": "Directory services",
+            "Service": "LDAP server"
+          },
+          "examples": [
+            "ldapsearch -h hostname -p 389",
+            "netstat -an | grep :389"
+          ],
+          "notes": "Used for accessing directory services like Active Directory"
+        },
+        {
+          "id": "https",
+          "name": "HTTPS (443)",
+          "description": "HTTP Secure",
+          "content": {
+            "Port": "443",
+            "Protocol": "TCP",
+            "Purpose": "Encrypted web traffic",
+            "Service": "Secure web servers"
+          },
+          "examples": [
+            "curl https://example.com:443",
+            "openssl s_client -connect example.com:443",
+            "netstat -an | grep :443"
+          ],
+          "notes": "Encrypted web traffic using TLS/SSL"
+        },
+        {
+          "id": "smtps",
+          "name": "SMTPS (465)",
+          "description": "SMTP over SSL",
+          "content": {
+            "Port": "465",
+            "Protocol": "TCP",
+            "Purpose": "Secure email transmission",
+            "Service": "Mail server"
+          },
+          "examples": [
+            "openssl s_client -connect smtp.example.com:465",
+            "netstat -an | grep :465"
+          ],
+          "notes": "SMTP with SSL/TLS encryption"
+        },
+        {
+          "id": "smtp-submission",
+          "name": "SMTP Submission (587)",
+          "description": "SMTP with STARTTLS",
+          "content": {
+            "Port": "587",
+            "Protocol": "TCP",
+            "Purpose": "Authenticated email submission",
+            "Service": "Mail server"
+          },
+          "examples": [
+            "telnet smtp.example.com 587",
+            "netstat -an | grep :587"
+          ],
+          "notes": "Preferred port for mail submission with authentication"
+        },
+        {
+          "id": "ldaps",
+          "name": "LDAPS (636)",
+          "description": "LDAP over SSL",
+          "content": {
+            "Port": "636",
+            "Protocol": "TCP",
+            "Purpose": "Secure directory services",
+            "Service": "LDAP server"
+          },
+          "examples": [
+            "ldapsearch -H ldaps://hostname:636",
+            "netstat -an | grep :636"
+          ],
+          "notes": "LDAP with SSL/TLS encryption"
+        },
+        {
+          "id": "imaps",
+          "name": "IMAPS (993)",
+          "description": "IMAP over SSL",
+          "content": {
+            "Port": "993",
+            "Protocol": "TCP",
+            "Purpose": "Secure email access",
+            "Service": "Mail server"
+          },
+          "examples": [
+            "openssl s_client -connect mail.example.com:993",
+            "netstat -an | grep :993"
+          ],
+          "notes": "IMAP with SSL/TLS encryption"
+        },
+        {
+          "id": "pop3s",
+          "name": "POP3S (995)",
+          "description": "POP3 over SSL",
+          "content": {
+            "Port": "995",
+            "Protocol": "TCP",
+            "Purpose": "Secure email retrieval",
+            "Service": "Mail server"
+          },
+          "examples": [
+            "openssl s_client -connect mail.example.com:995",
+            "netstat -an | grep :995"
+          ],
+          "notes": "POP3 with SSL/TLS encryption"
+        },
+        {
+          "id": "mssql",
+          "name": "MS SQL Server (1433)",
+          "description": "Microsoft SQL Server",
+          "content": {
+            "Port": "1433",
+            "Protocol": "TCP",
+            "Purpose": "Database connections",
+            "Service": "MS SQL Server"
+          },
+          "examples": [
+            "telnet hostname 1433",
+            "netstat -an | grep :1433"
+          ],
+          "notes": "Default Microsoft SQL Server port"
+        },
+        {
+          "id": "oracle",
+          "name": "Oracle DB (1521)",
+          "description": "Oracle Database",
+          "content": {
+            "Port": "1521",
+            "Protocol": "TCP",
+            "Purpose": "Database connections",
+            "Service": "Oracle Database"
+          },
+          "examples": [
+            "telnet hostname 1521",
+            "netstat -an | grep :1521"
+          ],
+          "notes": "Default Oracle database listener port"
+        },
+        {
           "id": "mysql",
-          "name": "MySQL",
+          "name": "MySQL (3306)",
           "description": "MySQL Database",
           "content": {
             "Port": "3306",
@@ -131,8 +370,25 @@
           "notes": "Default MySQL/MariaDB port"
         },
         {
+          "id": "rdp",
+          "name": "RDP (3389)",
+          "description": "Remote Desktop Protocol",
+          "content": {
+            "Port": "3389",
+            "Protocol": "TCP",
+            "Purpose": "Windows remote desktop",
+            "Service": "Remote Desktop"
+          },
+          "examples": [
+            "rdesktop hostname:3389",
+            "telnet hostname 3389",
+            "netstat -an | grep :3389"
+          ],
+          "notes": "Windows remote desktop access"
+        },
+        {
           "id": "postgresql",
-          "name": "PostgreSQL",
+          "name": "PostgreSQL (5432)",
           "description": "PostgreSQL Database",
           "content": {
             "Port": "5432",
@@ -148,21 +404,102 @@
           "notes": "Default PostgreSQL port"
         },
         {
-          "id": "rdp",
-          "name": "RDP",
-          "description": "Remote Desktop Protocol",
+          "id": "vnc",
+          "name": "VNC (5900)",
+          "description": "Virtual Network Computing",
           "content": {
-            "Port": "3389",
+            "Port": "5900+",
             "Protocol": "TCP",
-            "Purpose": "Windows remote desktop",
-            "Service": "Remote Desktop"
+            "Purpose": "Remote desktop access",
+            "Service": "VNC server"
           },
           "examples": [
-            "rdesktop hostname:3389",
-            "telnet hostname 3389",
-            "netstat -an | grep :3389"
+            "vncviewer hostname:5900",
+            "netstat -an | grep :5900"
           ],
-          "notes": "Windows remote desktop access"
+          "notes": "Display :0 uses 5900, :1 uses 5901, etc."
+        },
+        {
+          "id": "redis",
+          "name": "Redis (6379)",
+          "description": "Redis Database",
+          "content": {
+            "Port": "6379",
+            "Protocol": "TCP",
+            "Purpose": "Key-value data store",
+            "Service": "Redis server"
+          },
+          "examples": [
+            "redis-cli -h hostname -p 6379",
+            "telnet hostname 6379",
+            "netstat -an | grep :6379"
+          ],
+          "notes": "Default Redis port"
+        },
+        {
+          "id": "http-alt",
+          "name": "HTTP Alternate (8080)",
+          "description": "Alternative HTTP Port",
+          "content": {
+            "Port": "8080",
+            "Protocol": "TCP",
+            "Purpose": "Alternative web traffic",
+            "Service": "Web servers, proxies"
+          },
+          "examples": [
+            "curl http://example.com:8080",
+            "netstat -an | grep :8080"
+          ],
+          "notes": "Commonly used for development and proxy servers"
+        },
+        {
+          "id": "https-alt",
+          "name": "HTTPS Alternate (8443)",
+          "description": "Alternative HTTPS Port",
+          "content": {
+            "Port": "8443",
+            "Protocol": "TCP",
+            "Purpose": "Alternative secure web traffic",
+            "Service": "Secure web servers"
+          },
+          "examples": [
+            "curl https://example.com:8443",
+            "netstat -an | grep :8443"
+          ],
+          "notes": "Commonly used for secure development and admin interfaces"
+        },
+        {
+          "id": "elasticsearch",
+          "name": "Elasticsearch (9200)",
+          "description": "Elasticsearch REST API",
+          "content": {
+            "Port": "9200",
+            "Protocol": "TCP",
+            "Purpose": "Search and analytics",
+            "Service": "Elasticsearch"
+          },
+          "examples": [
+            "curl http://hostname:9200",
+            "netstat -an | grep :9200"
+          ],
+          "notes": "Default Elasticsearch HTTP/REST port"
+        },
+        {
+          "id": "mongodb",
+          "name": "MongoDB (27017)",
+          "description": "MongoDB Database",
+          "content": {
+            "Port": "27017",
+            "Protocol": "TCP",
+            "Purpose": "NoSQL database connections",
+            "Service": "MongoDB server"
+          },
+          "examples": [
+            "mongo hostname:27017",
+            "telnet hostname 27017",
+            "netstat -an | grep :27017"
+          ],
+          "notes": "Default MongoDB port"
         }
       ]
     },
@@ -249,6 +586,28 @@
             "telnet smtp.example.com 25"
           ],
           "notes": "Press Ctrl+] then 'quit' to exit"
+        },
+        {
+          "id": "nc",
+          "name": "nc (netcat)",
+          "description": "Network Swiss army knife",
+          "content": {
+            "Command": "nc [options] host port",
+            "Protocol": "TCP/UDP",
+            "Purpose": "Network connections and port testing"
+          },
+          "examples": [
+            "nc -zv hostname 80",
+            "nc -l 1234",
+            "nc hostname 22"
+          ],
+          "details": [
+            {"label": "-z", "value": "Port scanning mode"},
+            {"label": "-v", "value": "Verbose output"},
+            {"label": "-l", "value": "Listen mode"},
+            {"label": "-u", "value": "UDP mode"}
+          ],
+          "notes": "Versatile tool for port scanning and network testing"
         }
       ]
     },
