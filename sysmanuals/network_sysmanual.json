@@ -12,123 +12,8 @@
       "name": "Common Ports",
       "entries": [
         {
-          "id": "ftp-data",
-          "name": "FTP Data (20)",
-          "description": "FTP Data Transfer",
-          "content": {
-            "Port": "20",
-            "Protocol": "TCP",
-            "Purpose": "FTP data transfer (active mode)",
-            "Service": "FTP server"
-          },
-          "examples": [
-            "netstat -an | grep :20"
-          ],
-          "notes": "Used for FTP active mode data transfers"
-        },
-        {
-          "id": "ftp",
-          "name": "FTP (21)",
-          "description": "File Transfer Protocol Control",
-          "content": {
-            "Port": "21",
-            "Protocol": "TCP",
-            "Purpose": "FTP command/control",
-            "Service": "FTP server"
-          },
-          "examples": [
-            "ftp ftp.example.com",
-            "telnet example.com 21",
-            "netstat -an | grep :21"
-          ],
-          "notes": "WARNING: Insecure - credentials sent in plain text"
-        },
-        {
-          "id": "ssh",
-          "name": "SSH (22)",
-          "description": "Secure Shell",
-          "content": {
-            "Port": "22",
-            "Protocol": "TCP",
-            "Purpose": "Secure remote access",
-            "Service": "SSH server"
-          },
-          "examples": [
-            "ssh user@hostname",
-            "ssh -p 22 user@hostname",
-            "netstat -an | grep :22"
-          ],
-          "notes": "Default port for SSH connections"
-        },
-        {
-          "id": "telnet",
-          "name": "Telnet (23)",
-          "description": "Telnet Protocol",
-          "content": {
-            "Port": "23",
-            "Protocol": "TCP",
-            "Purpose": "Unencrypted remote access",
-            "Service": "Telnet server"
-          },
-          "examples": [
-            "telnet hostname 23",
-            "netstat -an | grep :23"
-          ],
-          "notes": "WARNING: Insecure - all data sent in plain text. Use SSH instead"
-        },
-        {
-          "id": "smtp",
-          "name": "SMTP (25)",
-          "description": "Simple Mail Transfer Protocol",
-          "content": {
-            "Port": "25",
-            "Protocol": "TCP",
-            "Purpose": "Email transmission",
-            "Service": "Mail server"
-          },
-          "examples": [
-            "telnet smtp.example.com 25",
-            "netstat -an | grep :25",
-            "nc smtp.example.com 25"
-          ],
-          "notes": "Standard SMTP port, often blocked by ISPs to prevent spam"
-        },
-        {
-          "id": "dns",
-          "name": "DNS (53)",
-          "description": "Domain Name System",
-          "content": {
-            "Port": "53",
-            "Protocol": "UDP (queries), TCP (zone transfers)",
-            "Purpose": "Domain name resolution",
-            "Service": "DNS server"
-          },
-          "examples": [
-            "dig @8.8.8.8 example.com",
-            "nslookup example.com 8.8.8.8",
-            "netstat -an | grep :53"
-          ],
-          "notes": "Translates domain names to IP addresses"
-        },
-        {
-          "id": "dhcp",
-          "name": "DHCP (67/68)",
-          "description": "Dynamic Host Configuration Protocol",
-          "content": {
-            "Port": "67 (server), 68 (client)",
-            "Protocol": "UDP",
-            "Purpose": "Automatic IP address assignment",
-            "Service": "DHCP server"
-          },
-          "examples": [
-            "sudo dhclient eth0",
-            "netstat -an | grep :67"
-          ],
-          "notes": "Server uses port 67, clients use port 68"
-        },
-        {
           "id": "http",
-          "name": "HTTP (80)",
+          "name": "HTTP",
           "description": "Hypertext Transfer Protocol",
           "content": {
             "Port": "80",
@@ -144,88 +29,8 @@
           "notes": "Standard port for unencrypted web traffic"
         },
         {
-          "id": "pop3",
-          "name": "POP3 (110)",
-          "description": "Post Office Protocol v3",
-          "content": {
-            "Port": "110",
-            "Protocol": "TCP",
-            "Purpose": "Email retrieval",
-            "Service": "Mail server"
-          },
-          "examples": [
-            "telnet mail.example.com 110",
-            "netstat -an | grep :110"
-          ],
-          "notes": "Downloads emails from server to client"
-        },
-        {
-          "id": "ntp",
-          "name": "NTP (123)",
-          "description": "Network Time Protocol",
-          "content": {
-            "Port": "123",
-            "Protocol": "UDP",
-            "Purpose": "Time synchronization",
-            "Service": "NTP server"
-          },
-          "examples": [
-            "ntpdate pool.ntp.org",
-            "netstat -an | grep :123"
-          ],
-          "notes": "Synchronizes system clocks across networks"
-        },
-        {
-          "id": "imap",
-          "name": "IMAP (143)",
-          "description": "Internet Message Access Protocol",
-          "content": {
-            "Port": "143",
-            "Protocol": "TCP",
-            "Purpose": "Email access and management",
-            "Service": "Mail server"
-          },
-          "examples": [
-            "telnet mail.example.com 143",
-            "netstat -an | grep :143"
-          ],
-          "notes": "Manages emails on server, more flexible than POP3"
-        },
-        {
-          "id": "snmp",
-          "name": "SNMP (161/162)",
-          "description": "Simple Network Management Protocol",
-          "content": {
-            "Port": "161 (agent), 162 (trap)",
-            "Protocol": "UDP",
-            "Purpose": "Network device monitoring",
-            "Service": "SNMP agent"
-          },
-          "examples": [
-            "snmpwalk -v2c -c public hostname",
-            "netstat -an | grep :161"
-          ],
-          "notes": "Used for monitoring and managing network devices"
-        },
-        {
-          "id": "ldap",
-          "name": "LDAP (389)",
-          "description": "Lightweight Directory Access Protocol",
-          "content": {
-            "Port": "389",
-            "Protocol": "TCP/UDP",
-            "Purpose": "Directory services",
-            "Service": "LDAP server"
-          },
-          "examples": [
-            "ldapsearch -h hostname -p 389",
-            "netstat -an | grep :389"
-          ],
-          "notes": "Used for accessing directory services like Active Directory"
-        },
-        {
           "id": "https",
-          "name": "HTTPS (443)",
+          "name": "HTTPS",
           "description": "HTTP Secure",
           "content": {
             "Port": "443",
@@ -241,120 +46,76 @@
           "notes": "Encrypted web traffic using TLS/SSL"
         },
         {
-          "id": "smtps",
-          "name": "SMTPS (465)",
-          "description": "SMTP over SSL",
+          "id": "ssh",
+          "name": "SSH",
+          "description": "Secure Shell",
           "content": {
-            "Port": "465",
+            "Port": "22",
             "Protocol": "TCP",
-            "Purpose": "Secure email transmission",
+            "Purpose": "Secure remote access",
+            "Service": "SSH server"
+          },
+          "examples": [
+            "ssh user@hostname",
+            "ssh -p 22 user@hostname",
+            "netstat -an | grep :22"
+          ],
+          "notes": "Default port for SSH connections"
+        },
+        {
+          "id": "ftp",
+          "name": "FTP",
+          "description": "File Transfer Protocol",
+          "content": {
+            "Port": "21 (control), 20 (data)",
+            "Protocol": "TCP",
+            "Purpose": "File transfer",
+            "Service": "FTP server"
+          },
+          "examples": [
+            "ftp ftp.example.com",
+            "telnet example.com 21",
+            "netstat -an | grep :21"
+          ],
+          "notes": "WARNING: Insecure - credentials sent in plain text"
+        },
+        {
+          "id": "smtp",
+          "name": "SMTP",
+          "description": "Simple Mail Transfer Protocol",
+          "content": {
+            "Port": "25 (unencrypted), 587 (TLS), 465 (SSL)",
+            "Protocol": "TCP",
+            "Purpose": "Email transmission",
             "Service": "Mail server"
           },
           "examples": [
-            "openssl s_client -connect smtp.example.com:465",
-            "netstat -an | grep :465"
+            "telnet smtp.example.com 25",
+            "netstat -an | grep :25",
+            "nc smtp.example.com 587"
           ],
-          "notes": "SMTP with SSL/TLS encryption"
+          "notes": "Port 587 preferred for mail submission"
         },
         {
-          "id": "smtp-submission",
-          "name": "SMTP Submission (587)",
-          "description": "SMTP with STARTTLS",
+          "id": "dns",
+          "name": "DNS",
+          "description": "Domain Name System",
           "content": {
-            "Port": "587",
-            "Protocol": "TCP",
-            "Purpose": "Authenticated email submission",
-            "Service": "Mail server"
+            "Port": "53",
+            "Protocol": "UDP (queries), TCP (zone transfers)",
+            "Purpose": "Domain name resolution",
+            "Service": "DNS server"
           },
           "examples": [
-            "telnet smtp.example.com 587",
-            "netstat -an | grep :587"
+            "dig @8.8.8.8 example.com",
+            "nslookup example.com 8.8.8.8",
+            "netstat -an | grep :53"
           ],
-          "notes": "Preferred port for mail submission with authentication"
-        },
-        {
-          "id": "ldaps",
-          "name": "LDAPS (636)",
-          "description": "LDAP over SSL",
-          "content": {
-            "Port": "636",
-            "Protocol": "TCP",
-            "Purpose": "Secure directory services",
-            "Service": "LDAP server"
-          },
-          "examples": [
-            "ldapsearch -H ldaps://hostname:636",
-            "netstat -an | grep :636"
-          ],
-          "notes": "LDAP with SSL/TLS encryption"
-        },
-        {
-          "id": "imaps",
-          "name": "IMAPS (993)",
-          "description": "IMAP over SSL",
-          "content": {
-            "Port": "993",
-            "Protocol": "TCP",
-            "Purpose": "Secure email access",
-            "Service": "Mail server"
-          },
-          "examples": [
-            "openssl s_client -connect mail.example.com:993",
-            "netstat -an | grep :993"
-          ],
-          "notes": "IMAP with SSL/TLS encryption"
-        },
-        {
-          "id": "pop3s",
-          "name": "POP3S (995)",
-          "description": "POP3 over SSL",
-          "content": {
-            "Port": "995",
-            "Protocol": "TCP",
-            "Purpose": "Secure email retrieval",
-            "Service": "Mail server"
-          },
-          "examples": [
-            "openssl s_client -connect mail.example.com:995",
-            "netstat -an | grep :995"
-          ],
-          "notes": "POP3 with SSL/TLS encryption"
-        },
-        {
-          "id": "mssql",
-          "name": "MS SQL Server (1433)",
-          "description": "Microsoft SQL Server",
-          "content": {
-            "Port": "1433",
-            "Protocol": "TCP",
-            "Purpose": "Database connections",
-            "Service": "MS SQL Server"
-          },
-          "examples": [
-            "telnet hostname 1433",
-            "netstat -an | grep :1433"
-          ],
-          "notes": "Default Microsoft SQL Server port"
-        },
-        {
-          "id": "oracle",
-          "name": "Oracle DB (1521)",
-          "description": "Oracle Database",
-          "content": {
-            "Port": "1521",
-            "Protocol": "TCP",
-            "Purpose": "Database connections",
-            "Service": "Oracle Database"
-          },
-          "examples": [
-            "telnet hostname 1521",
-            "netstat -an | grep :1521"
-          ],
-          "notes": "Default Oracle database listener port"
+          "notes": "Translates domain names to IP addresses"
         },
         {
           "id": "mysql",
-          "name": "MySQL (3306)",
+          "name": "MySQL",
           "description": "MySQL Database",
           "content": {
             "Port": "3306",
@@ -370,25 +131,8 @@
           "notes": "Default MySQL/MariaDB port"
         },
         {
-          "id": "rdp",
-          "name": "RDP (3389)",
-          "description": "Remote Desktop Protocol",
-          "content": {
-            "Port": "3389",
-            "Protocol": "TCP",
-            "Purpose": "Windows remote desktop",
-            "Service": "Remote Desktop"
-          },
-          "examples": [
-            "rdesktop hostname:3389",
-            "telnet hostname 3389",
-            "netstat -an | grep :3389"
-          ],
-          "notes": "Windows remote desktop access"
-        },
-        {
           "id": "postgresql",
-          "name": "PostgreSQL (5432)",
+          "name": "PostgreSQL",
           "description": "PostgreSQL Database",
           "content": {
             "Port": "5432",
@@ -404,102 +148,165 @@
           "notes": "Default PostgreSQL port"
         },
         {
-          "id": "vnc",
-          "name": "VNC (5900)",
-          "description": "Virtual Network Computing",
+          "id": "rdp",
+          "name": "RDP",
+          "description": "Remote Desktop Protocol",
           "content": {
-            "Port": "5900+",
+            "Port": "3389",
             "Protocol": "TCP",
-            "Purpose": "Remote desktop access",
-            "Service": "VNC server"
+            "Purpose": "Windows remote desktop",
+            "Service": "Remote Desktop"
           },
           "examples": [
-            "vncviewer hostname:5900",
-            "netstat -an | grep :5900"
+            "rdesktop hostname:3389",
+            "telnet hostname 3389",
+            "netstat -an | grep :3389"
           ],
-          "notes": "Display :0 uses 5900, :1 uses 5901, etc."
+          "notes": "Windows remote desktop access"
         },
         {
-          "id": "redis",
-          "name": "Redis (6379)",
-          "description": "Redis Database",
+          "id": "telnet",
+          "name": "Telnet",
+          "description": "Telnet Protocol",
           "content": {
-            "Port": "6379",
+            "Port": "23",
             "Protocol": "TCP",
-            "Purpose": "Key-value data store",
-            "Service": "Redis server"
+            "Purpose": "Remote command-line access (unencrypted)",
+            "Service": "Telnet server"
           },
           "examples": [
-            "redis-cli -h hostname -p 6379",
-            "telnet hostname 6379",
-            "netstat -an | grep :6379"
+            "telnet example.com 23",
+            "netstat -an | grep :23"
           ],
-          "notes": "Default Redis port"
+          "notes": "WARNING: Insecure - transmits credentials and data in plain text"
         },
         {
-          "id": "http-alt",
-          "name": "HTTP Alternate (8080)",
-          "description": "Alternative HTTP Port",
+          "id": "dhcp",
+          "name": "DHCP",
+          "description": "Dynamic Host Configuration Protocol",
           "content": {
-            "Port": "8080",
-            "Protocol": "TCP",
-            "Purpose": "Alternative web traffic",
-            "Service": "Web servers, proxies"
+            "Port": "67 (server), 68 (client)",
+            "Protocol": "UDP",
+            "Purpose": "Automatic IP address assignment",
+            "Service": "DHCP server/client"
           },
           "examples": [
-            "curl http://example.com:8080",
-            "netstat -an | grep :8080"
+            "tcpdump -i eth0 port 67 or port 68",
+            "netstat -an | grep :67"
           ],
-          "notes": "Commonly used for development and proxy servers"
+          "notes": "Used for a client to request an IP address from a server"
         },
         {
-          "id": "https-alt",
-          "name": "HTTPS Alternate (8443)",
-          "description": "Alternative HTTPS Port",
+          "id": "tftp",
+          "name": "TFTP",
+          "description": "Trivial File Transfer Protocol",
           "content": {
-            "Port": "8443",
-            "Protocol": "TCP",
-            "Purpose": "Alternative secure web traffic",
-            "Service": "Secure web servers"
+            "Port": "69",
+            "Protocol": "UDP",
+            "Purpose": "Simple, non-authenticated file transfer",
+            "Service": "TFTP server"
           },
           "examples": [
-            "curl https://example.com:8443",
-            "netstat -an | grep :8443"
+            "tftp 192.168.1.1 -c get bootfile",
+            "netstat -an | grep :69"
           ],
-          "notes": "Commonly used for secure development and admin interfaces"
+          "notes": "Trivial File Transfer Protocol - no authentication and very simple"
         },
         {
-          "id": "elasticsearch",
-          "name": "Elasticsearch (9200)",
-          "description": "Elasticsearch REST API",
+          "id": "pop3",
+          "name": "POP3",
+          "description": "Post Office Protocol v3",
           "content": {
-            "Port": "9200",
+            "Port": "110 (unencrypted), 995 (SSL)",
             "Protocol": "TCP",
-            "Purpose": "Search and analytics",
-            "Service": "Elasticsearch"
+            "Purpose": "Email retrieval (downloads and deletes from server)",
+            "Service": "Mail server"
           },
           "examples": [
-            "curl http://hostname:9200",
-            "netstat -an | grep :9200"
+            "telnet pop.example.com 110",
+            "netstat -an | grep :110"
           ],
-          "notes": "Default Elasticsearch HTTP/REST port"
+          "notes": "Less common than IMAP; POP3S (encrypted) uses 995."
         },
         {
-          "id": "mongodb",
-          "name": "MongoDB (27017)",
-          "description": "MongoDB Database",
+          "id": "nntp",
+          "name": "NNTP",
+          "description": "Network News Transfer Protocol",
           "content": {
-            "Port": "27017",
+            "Port": "119",
             "Protocol": "TCP",
-            "Purpose": "NoSQL database connections",
-            "Service": "MongoDB server"
+            "Purpose": "Transfer of Usenet news articles",
+            "Service": "News server"
           },
           "examples": [
-            "mongo hostname:27017",
-            "telnet hostname 27017",
-            "netstat -an | grep :27017"
+            "telnet news.example.com 119",
+            "netstat -an | grep :119"
           ],
-          "notes": "Default MongoDB port"
+          "notes": "Historically used for Usenet newsgroups"
+        },
+        {
+          "id": "ntp",
+          "name": "NTP",
+          "description": "Network Time Protocol",
+          "content": {
+            "Port": "123",
+            "Protocol": "UDP",
+            "Purpose": "Clock synchronization",
+            "Service": "NTP server"
+          },
+          "examples": [
+            "ntpdate -q pool.ntp.org",
+            "netstat -an | grep :123"
+          ],
+          "notes": "Essential for time-sensitive services and security protocols"
+        },
+        {
+          "id": "imap",
+          "name": "IMAP",
+          "description": "Internet Message Access Protocol",
+          "content": {
+            "Port": "143 (unencrypted), 993 (SSL)",
+            "Protocol": "TCP",
+            "Purpose": "Email access (manages mail on the server)",
+            "Service": "Mail server"
+          },
+          "examples": [
+            "telnet imap.example.com 143",
+            "netstat -an | grep :143"
+          ],
+          "notes": "Allows users to manage and access email from multiple devices. IMAPS (encrypted) uses 993."
+        },
+        {
+          "id": "snmp",
+          "name": "SNMP",
+          "description": "Simple Network Management Protocol",
+          "content": {
+            "Port": "161 (agent), 162 (trap)",
+            "Protocol": "UDP",
+            "Purpose": "Network device monitoring and management",
+            "Service": "SNMP agent/manager"
+          },
+          "examples": [
+            "snmpwalk -v 2c -c public 192.168.1.1",
+            "netstat -an | grep :161"
+          ],
+          "notes": "Version 3 adds authentication and encryption"
+        },
+        {
+          "id": "ldap",
+          "name": "LDAP",
+          "description": "Lightweight Directory Access Protocol",
+          "content": {
+            "Port": "389 (unencrypted), 636 (SSL)",
+            "Protocol": "TCP/UDP",
+            "Purpose": "Directory service queries and management",
+            "Service": "Directory server"
+          },
+          "examples": [
+            "ldapsearch -h ldap.example.com -p 389",
+            "netstat -an | grep :389"
+          ],
+          "notes": "Used for centralized authentication and directory storage"
         }
       ]
     },
@@ -522,10 +329,22 @@
             "ping -i 0.5 -c 10 example.com"
           ],
           "details": [
-            {"label": "-c count", "value": "Stop after count packets"},
-            {"label": "-i interval", "value": "Wait interval seconds between packets"},
-            {"label": "-s size", "value": "Packet size in bytes"},
-            {"label": "-t ttl", "value": "Set Time To Live"}
+            {
+              "label": "-c count",
+              "value": "Stop after count packets"
+            },
+            {
+              "label": "-i interval",
+              "value": "Wait interval seconds between packets"
+            },
+            {
+              "label": "-s size",
+              "value": "Packet size in bytes"
+            },
+            {
+              "label": "-t ttl",
+              "value": "Set Time To Live"
+            }
           ],
           "notes": "Sends ICMP echo requests to test connectivity"
         },
@@ -544,9 +363,18 @@
             "traceroute -m 15 example.com"
           ],
           "details": [
-            {"label": "-n", "value": "Don't resolve hostnames"},
-            {"label": "-m max_ttl", "value": "Maximum number of hops"},
-            {"label": "-q nqueries", "value": "Probes per hop"}
+            {
+              "label": "-n",
+              "value": "Don't resolve hostnames"
+            },
+            {
+              "label": "-m max_ttl",
+              "value": "Maximum number of hops"
+            },
+            {
+              "label": "-q nqueries",
+              "value": "Probes per hop"
+            }
           ],
           "notes": "Shows each hop between source and destination"
         },
@@ -565,49 +393,168 @@
             "mtr --report -c 100 example.com"
           ],
           "details": [
-            {"label": "-n", "value": "No DNS lookups"},
-            {"label": "-c count", "value": "Number of pings"},
-            {"label": "--report", "value": "Report mode"}
+            {
+              "label": "-n",
+              "value": "No DNS lookups"
+            },
+            {
+              "label": "-c count",
+              "value": "Number of..."
+            }
           ],
-          "notes": "Real-time diagnostics, press 'q' to quit"
-        },
+          "notes": "Generates continuous statistics on network path"
+        }
+      ]
+    },
+    {
+      "id": "network-utilities",
+      "name": "Network Utilities",
+      "entries": [
         {
-          "id": "telnet",
-          "name": "telnet",
-          "description": "Test TCP port connectivity",
-          "content": {
-            "Command": "telnet host port",
-            "Protocol": "TCP",
-            "Purpose": "Test if port is open"
-          },
-          "examples": [
-            "telnet example.com 80",
-            "telnet 192.168.1.1 22",
-            "telnet smtp.example.com 25"
-          ],
-          "notes": "Press Ctrl+] then 'quit' to exit"
-        },
-        {
-          "id": "nc",
-          "name": "nc (netcat)",
-          "description": "Network Swiss army knife",
+          "id": "netcat",
+          "name": "netcat (nc)",
+          "description": "Swiss Army knife for networking",
           "content": {
             "Command": "nc [options] host port",
             "Protocol": "TCP/UDP",
-            "Purpose": "Network connections and port testing"
+            "Purpose": "Read/write data across network connections"
           },
           "examples": [
-            "nc -zv hostname 80",
-            "nc -l 1234",
-            "nc hostname 22"
+            "nc -l -p 8080 (listen)",
+            "nc 192.168.1.1 80 (connect)",
+            "echo 'test' | nc 192.168.1.1 80"
           ],
           "details": [
-            {"label": "-z", "value": "Port scanning mode"},
-            {"label": "-v", "value": "Verbose output"},
-            {"label": "-l", "value": "Listen mode"},
-            {"label": "-u", "value": "UDP mode"}
+            {
+              "label": "-l",
+              "value": "Listen mode"
+            },
+            {
+              "label": "-p port",
+              "value": "Local port"
+            },
+            {
+              "label": "-v",
+              "value": "Verbose"
+            },
+            {
+              "label": "-u",
+              "value": "UDP mode"
+            }
           ],
-          "notes": "Versatile tool for port scanning and network testing"
+          "notes": "Can be used for port scanning, file transfer, and simple chat"
+        },
+        {
+          "id": "netstat",
+          "name": "netstat",
+          "description": "Display network connections",
+          "content": {
+            "Command": "netstat [options]",
+            "Purpose": "Display network connections"
+          },
+          "examples": [
+            "netstat -tuln",
+            "netstat -anp",
+            "netstat -r"
+          ],
+          "details": [
+            {
+              "label": "-t",
+              "value": "TCP connections"
+            },
+            {
+              "label": "-u",
+              "value": "UDP connections"
+            },
+            {
+              "label": "-l",
+              "value": "Listening sockets"
+            },
+            {
+              "label": "-n",
+              "value": "Numerical addresses"
+            },
+            {
+              "label": "-p",
+              "value": "Show program/PID"
+            }
+          ],
+          "notes": "WARNING: Deprecated - use 'ss' command"
+        },
+        {
+          "id": "ss",
+          "name": "ss",
+          "description": "Socket statistics",
+          "content": {
+            "Command": "ss [options]",
+            "Purpose": "Display socket information"
+          },
+          "examples": [
+            "ss -tuln",
+            "ss -anp",
+            "ss -s"
+          ],
+          "details": [
+            {
+              "label": "-t",
+              "value": "TCP sockets"
+            },
+            {
+              "label": "-u",
+              "value": "UDP sockets"
+            },
+            {
+              "label": "-l",
+              "value": "Listening sockets"
+            },
+            {
+              "label": "-n",
+              "value": "Don't resolve names"
+            },
+            {
+              "label": "-p",
+              "value": "Show process"
+            }
+          ],
+          "notes": "Modern replacement for netstat"
+        },
+        {
+          "id": "tcpdump",
+          "name": "tcpdump",
+          "description": "Packet capture and analysis",
+          "content": {
+            "Command": "tcpdump [options]",
+            "Protocol": "Various",
+            "Purpose": "Capture network packets"
+          },
+          "examples": [
+            "sudo tcpdump -i eth0",
+            "sudo tcpdump -i eth0 port 80",
+            "sudo tcpdump -i eth0 -w capture.pcap"
+          ],
+          "details": [
+            {
+              "label": "-i interface",
+              "value": "Capture on interface"
+            },
+            {
+              "label": "-w file",
+              "value": "Write to file"
+            },
+            {
+              "label": "-r file",
+              "value": "Read from file"
+            },
+            {
+              "label": "port N",
+              "value": "Filter by port number"
+            },
+            {
+              "label": "host X",
+              "value": "Filter by host address"
+            }
+          ],
+          "notes": "Powerful command-line packet sniffer"
         }
       ]
     },
@@ -630,10 +577,22 @@
             "nslookup -type=MX gmail.com"
           ],
           "details": [
-            {"label": "-type=A", "value": "IPv4 addresses"},
-            {"label": "-type=AAAA", "value": "IPv6 addresses"},
-            {"label": "-type=MX", "value": "Mail servers"},
-            {"label": "-type=NS", "value": "Name servers"}
+            {
+              "label": "-type=A",
+              "value": "IPv4 addresses"
+            },
+            {
+              "label": "-type=AAAA",
+              "value": "IPv6 addresses"
+            },
+            {
+              "label": "-type=MX",
+              "value": "Mail servers"
+            },
+            {
+              "label": "-type=NS",
+              "value": "Name servers"
+            }
           ]
         },
         {
@@ -652,10 +611,22 @@
             "dig -x 8.8.8.8"
           ],
           "details": [
-            {"label": "@server", "value": "Query specific DNS server"},
-            {"label": "+short", "value": "Short output"},
-            {"label": "-x", "value": "Reverse DNS lookup"},
-            {"label": "+trace", "value": "Trace delegation path"}
+            {
+              "label": "@server",
+              "value": "Query specific DNS server"
+            },
+            {
+              "label": "+short",
+              "value": "Short output"
+            },
+            {
+              "label": "-x",
+              "value": "Reverse DNS lookup"
+            },
+            {
+              "label": "+trace",
+              "value": "Trace delegation path"
+            }
           ],
           "notes": "More powerful than nslookup"
         },
@@ -674,181 +645,18 @@
             "host 8.8.8.8"
           ],
           "details": [
-            {"label": "-t type", "value": "Query specific record type"},
-            {"label": "-a", "value": "Show all records"},
-            {"label": "-v", "value": "Verbose output"}
+            {
+              "label": "-t type",
+              "value": "Query resource record type (A, MX, NS, etc.)"
+            }
           ]
         }
       ]
     },
     {
-      "id": "network-config",
-      "name": "Network Configuration",
+      "id": "web-tools",
+      "name": "Web/Application Tools",
       "entries": [
-        {
-          "id": "ip",
-          "name": "ip",
-          "description": "Modern network configuration",
-          "content": {
-            "Command": "ip [object] [command]",
-            "Purpose": "Configure network interfaces"
-          },
-          "examples": [
-            "ip addr show",
-            "ip link show",
-            "ip route show",
-            "sudo ip addr add 192.168.1.100/24 dev eth0"
-          ],
-          "details": [
-            {"label": "addr", "value": "Manage IP addresses"},
-            {"label": "link", "value": "Manage network devices"},
-            {"label": "route", "value": "Manage routing table"},
-            {"label": "neigh", "value": "Manage ARP cache"}
-          ],
-          "notes": "Modern replacement for ifconfig"
-        },
-        {
-          "id": "ifconfig",
-          "name": "ifconfig",
-          "description": "Legacy network interface configuration",
-          "content": {
-            "Command": "ifconfig [interface] [options]",
-            "Purpose": "Configure network interfaces"
-          },
-          "examples": [
-            "ifconfig",
-            "ifconfig eth0",
-            "sudo ifconfig eth0 up"
-          ],
-          "details": [
-            {"label": "up", "value": "Activate interface"},
-            {"label": "down", "value": "Deactivate interface"},
-            {"label": "netmask", "value": "Set subnet mask"}
-          ],
-          "notes": "WARNING: Deprecated - use 'ip' command"
-        }
-      ]
-    },
-    {
-      "id": "monitoring-tools",
-      "name": "Network Monitoring",
-      "entries": [
-        {
-          "id": "netstat",
-          "name": "netstat",
-          "description": "Network statistics and connections",
-          "content": {
-            "Command": "netstat [options]",
-            "Purpose": "Display network connections"
-          },
-          "examples": [
-            "netstat -tuln",
-            "netstat -anp",
-            "netstat -r"
-          ],
-          "details": [
-            {"label": "-t", "value": "TCP connections"},
-            {"label": "-u", "value": "UDP connections"},
-            {"label": "-l", "value": "Listening sockets"},
-            {"label": "-n", "value": "Numerical addresses"},
-            {"label": "-p", "value": "Show program/PID"}
-          ],
-          "notes": "WARNING: Deprecated - use 'ss' command"
-        },
-        {
-          "id": "ss",
-          "name": "ss",
-          "description": "Socket statistics",
-          "content": {
-            "Command": "ss [options]",
-            "Purpose": "Display socket information"
-          },
-          "examples": [
-            "ss -tuln",
-            "ss -anp",
-            "ss -s"
-          ],
-          "details": [
-            {"label": "-t", "value": "TCP sockets"},
-            {"label": "-u", "value": "UDP sockets"},
-            {"label": "-l", "value": "Listening sockets"},
-            {"label": "-n", "value": "Don't resolve names"},
-            {"label": "-p", "value": "Show process"}
-          ],
-          "notes": "Modern replacement for netstat"
-        },
-        {
-          "id": "tcpdump",
-          "name": "tcpdump",
-          "description": "Packet capture and analysis",
-          "content": {
-            "Command": "tcpdump [options]",
-            "Protocol": "Various",
-            "Purpose": "Capture network packets"
-          },
-          "examples": [
-            "sudo tcpdump -i eth0",
-            "sudo tcpdump -i eth0 port 80",
-            "sudo tcpdump -i eth0 -w capture.pcap"
-          ],
-          "details": [
-            {"label": "-i interface", "value": "Capture on interface"},
-            {"label": "-w file", "value": "Write to file"},
-            {"label": "-r file", "value": "Read from file"},
-            {"label": "-n", "value": "Don't resolve hostnames"}
-          ],
-          "notes": "Requires root privileges"
-        }
-      ]
-    },
-    {
-      "id": "file-transfer",
-      "name": "File Transfer",
-      "entries": [
-        {
-          "id": "scp",
-          "name": "scp",
-          "description": "Secure copy over SSH",
-          "content": {
-            "Command": "scp [options] source destination",
-            "Protocol": "SSH (TCP port 22)",
-            "Purpose": "Secure file transfer"
-          },
-          "examples": [
-            "scp file.txt user@remote:/path/",
-            "scp user@remote:/path/file.txt .",
-            "scp -r folder/ user@remote:/path/"
-          ],
-          "details": [
-            {"label": "-r", "value": "Recursively copy directories"},
-            {"label": "-P port", "value": "Connect to specific port"},
-            {"label": "-i key", "value": "Use specific SSH key"},
-            {"label": "-C", "value": "Enable compression"}
-          ],
-          "notes": "Uses SSH for secure transfer"
-        },
-        {
-          "id": "rsync",
-          "name": "rsync",
-          "description": "Efficient file synchronization",
-          "content": {
-            "Command": "rsync [options] source destination",
-            "Protocol": "SSH or rsync daemon",
-            "Purpose": "Sync files efficiently"
-          },
-          "examples": [
-            "rsync -avz folder/ user@remote:/backup/",
-            "rsync -avz --delete source/ dest/",
-            "rsync -avz -e 'ssh -p 2222' folder/ user@remote:/path/"
-          ],
-          "details": [
-            {"label": "-a", "value": "Archive mode"},
-            {"label": "-v", "value": "Verbose output"},
-            {"label": "-z", "value": "Compress during transfer"},
-            {"label": "--delete", "value": "Delete files not in source"}
-          ],
-          "notes": "Only transfers changed parts"
-        },
         {
           "id": "curl",
           "name": "curl",
@@ -864,10 +672,22 @@
             "curl -X POST -d 'data' https://api.example.com"
           ],
           "details": [
-            {"label": "-I", "value": "Fetch headers only"},
-            {"label": "-X method", "value": "HTTP method"},
-            {"label": "-d data", "value": "Send POST data"},
-            {"label": "-H header", "value": "Custom header"}
+            {
+              "label": "-I",
+              "value": "Fetch headers only"
+            },
+            {
+              "label": "-X method",
+              "value": "HTTP method"
+            },
+            {
+              "label": "-d data",
+              "value": "Send POST data"
+            },
+            {
+              "label": "-H header",
+              "value": "Custom header"
+            }
           ]
         },
         {
@@ -877,45 +697,66 @@
           "content": {
             "Command": "wget [options] URL",
             "Protocol": "HTTP/HTTPS/FTP",
-            "Purpose": "Download files"
+            "Purpose": "Retrieve files from the web"
           },
           "examples": [
             "wget https://example.com/file.zip",
-            "wget -c https://example.com/large-file.iso",
-            "wget -r -np https://example.com/dir/"
+            "wget -r http://example.com"
           ],
           "details": [
-            {"label": "-c", "value": "Continue interrupted download"},
-            {"label": "-r", "value": "Recursive download"},
-            {"label": "-np", "value": "No parent directories"}
-          ]
+            {
+              "label": "-r",
+              "value": "Recursive download"
+            },
+            {
+              "label": "-O file",
+              "value": "Save to file"
+            },
+            {
+              "label": "--limit-rate=X",
+              "value": "Limit download speed"
+            }
+          ],
+          "notes": "Best for simple, non-interactive downloads"
         }
       ]
     },
     {
-      "id": "firewall",
-      "name": "Firewall & Security",
+      "id": "security-tools",
+      "name": "Security and Firewall",
       "entries": [
         {
           "id": "iptables",
           "name": "iptables",
-          "description": "Packet filtering firewall",
+          "description": "Linux kernel firewall management",
           "content": {
-            "Command": "iptables [options] chain rule",
-            "Purpose": "Configure firewall rules"
+            "Command": "iptables [options] command",
+            "Purpose": "Configure packet filtering rules"
           },
           "examples": [
-            "sudo iptables -L -n -v",
+            "sudo iptables -L -v -n",
             "sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT",
-            "sudo iptables -A INPUT -j DROP"
+            "sudo iptables -P INPUT DROP"
           ],
           "details": [
-            {"label": "-L", "value": "List rules"},
-            {"label": "-A", "value": "Append rule"},
-            {"label": "-D", "value": "Delete rule"},
-            {"label": "-F", "value": "Flush all rules"}
+            {
+              "label": "-L",
+              "value": "List rules"
+            },
+            {
+              "label": "-A chain",
+              "value": "Append rule to chain"
+            },
+            {
+              "label": "-P chain",
+              "value": "Set default policy"
+            },
+            {
+              "label": "-j target",
+              "value": "Target (ACCEPT, DROP, REJECT)"
+            }
           ],
-          "notes": "WARNING: Be careful not to lock yourself out"
+          "notes": "Low-level firewall utility, complex to manage"
         },
         {
           "id": "ufw",
@@ -932,10 +773,22 @@
             "sudo ufw deny 23"
           ],
           "details": [
-            {"label": "enable", "value": "Enable firewall"},
-            {"label": "disable", "value": "Disable firewall"},
-            {"label": "allow", "value": "Allow connections"},
-            {"label": "deny", "value": "Deny connections"}
+            {
+              "label": "enable",
+              "value": "Enable firewall"
+            },
+            {
+              "label": "disable",
+              "value": "Disable firewall"
+            },
+            {
+              "label": "allow",
+              "value": "Allow connections"
+            },
+            {
+              "label": "deny",
+              "value": "Deny connections"
+            }
           ],
           "notes": "Simpler than iptables"
         },
@@ -953,12 +806,24 @@
             "nmap -p 80,443 example.com"
           ],
           "details": [
-            {"label": "-sP", "value": "Ping scan"},
-            {"label": "-sS", "value": "TCP SYN scan"},
-            {"label": "-p", "value": "Scan specific ports"},
-            {"label": "-A", "value": "Aggressive scan"}
+            {
+              "label": "-sP",
+              "value": "Ping scan"
+            },
+            {
+              "label": "-sS",
+              "value": "TCP SYN scan (stealth)"
+            },
+            {
+              "label": "-p ports",
+              "value": "Specify ports"
+            },
+            {
+              "label": "-A",
+              "value": "OS and version detection"
+            }
           ],
-          "notes": "WARNING: Only scan networks you own"
+          "notes": "Essential for security auditing and network inventory"
         }
       ]
     }
