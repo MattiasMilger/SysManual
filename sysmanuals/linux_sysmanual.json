@@ -1,0 +1,365 @@
+{
+  "id": "linux-sysmanual",
+  "name": "Linux SysManual",
+  "description": "Essential Linux commands and tools for system administration and daily use",
+  "theme": {
+    "primary": "#FFA500",
+    "accent": "#333333"
+  },
+  "categories": [
+    {
+      "id": "file-management",
+      "name": "File Management",
+      "entries": [
+        {
+          "id": "ls",
+          "name": "ls",
+          "description": "List directory contents",
+          "content": {
+            "Command": "ls [options] [path]",
+            "Purpose": "Display files and directories"
+          },
+          "examples": [
+            "ls -la",
+            "ls -lh /var/log",
+            "ls -R /etc"
+          ],
+          "details": [
+            {"label": "-l", "value": "Use long listing format"},
+            {"label": "-a", "value": "Show hidden files"},
+            {"label": "-h", "value": "Human-readable sizes"},
+            {"label": "-R", "value": "List subdirectories recursively"},
+            {"label": "-t", "value": "Sort by modification time"}
+          ],
+          "notes": "Combine options like -lah for detailed, human-readable output with hidden files"
+        },
+        {
+          "id": "cp",
+          "name": "cp",
+          "description": "Copy files and directories",
+          "content": {
+            "Command": "cp [options] source destination",
+            "Purpose": "Copy files or directories"
+          },
+          "examples": [
+            "cp file.txt /backup/",
+            "cp -r folder/ /backup/",
+            "cp -p file.txt file_backup.txt"
+          ],
+          "details": [
+            {"label": "-r", "value": "Copy directories recursively"},
+            {"label": "-p", "value": "Preserve file attributes"},
+            {"label": "-v", "value": "Verbose output"},
+            {"label": "-i", "value": "Prompt before overwrite"}
+          ]
+        },
+        {
+          "id": "mv",
+          "name": "mv",
+          "description": "Move or rename files and directories",
+          "content": {
+            "Command": "mv [options] source destination",
+            "Purpose": "Move or rename files/directories"
+          },
+          "examples": [
+            "mv oldname.txt newname.txt",
+            "mv file.txt /new/location/",
+            "mv -i file.txt /backup/"
+          ],
+          "details": [
+            {"label": "-i", "value": "Prompt before overwrite"},
+            {"label": "-v", "value": "Verbose output"},
+            {"label": "-n", "value": "Don't overwrite existing files"}
+          ]
+        },
+        {
+          "id": "rm",
+          "name": "rm",
+          "description": "Remove files or directories",
+          "content": {
+            "Command": "rm [options] file",
+            "Purpose": "Delete files or directories"
+          },
+          "examples": [
+            "rm file.txt",
+            "rm -rf directory/",
+            "rm -i *.log"
+          ],
+          "details": [
+            {"label": "-r", "value": "Remove directories recursively"},
+            {"label": "-f", "value": "Force removal without prompting"},
+            {"label": "-i", "value": "Prompt before removal"},
+            {"label": "-v", "value": "Verbose output"}
+          ],
+          "notes": "WARNING: Use with caution! Deleted files cannot be recovered easily"
+        },
+        {
+          "id": "find",
+          "name": "find",
+          "description": "Search for files and directories",
+          "content": {
+            "Command": "find [path] [options]",
+            "Purpose": "Locate files matching criteria"
+          },
+          "examples": [
+            "find . -name '*.txt'",
+            "find /home -type f -size +100M",
+            "find . -mtime -7"
+          ],
+          "details": [
+            {"label": "-name", "value": "Search by filename pattern"},
+            {"label": "-type f", "value": "Find only files"},
+            {"label": "-type d", "value": "Find only directories"},
+            {"label": "-size", "value": "Search by file size"},
+            {"label": "-mtime", "value": "Search by modification time"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "text-processing",
+      "name": "Text Processing",
+      "entries": [
+        {
+          "id": "grep",
+          "name": "grep",
+          "description": "Search text patterns in files",
+          "content": {
+            "Command": "grep [options] pattern [file]",
+            "Purpose": "Find text matching patterns"
+          },
+          "examples": [
+            "grep 'error' logfile.txt",
+            "grep -r 'TODO' ./src/",
+            "grep -i 'warning' *.log"
+          ],
+          "details": [
+            {"label": "-i", "value": "Ignore case"},
+            {"label": "-r", "value": "Recursive search"},
+            {"label": "-v", "value": "Invert match"},
+            {"label": "-n", "value": "Show line numbers"},
+            {"label": "-c", "value": "Count matches"}
+          ]
+        },
+        {
+          "id": "sed",
+          "name": "sed",
+          "description": "Stream editor for text manipulation",
+          "content": {
+            "Command": "sed [options] 'command' file",
+            "Purpose": "Transform and filter text"
+          },
+          "examples": [
+            "sed 's/old/new/g' file.txt",
+            "sed -i 's/foo/bar/g' file.txt",
+            "sed -n '10,20p' file.txt"
+          ],
+          "details": [
+            {"label": "-i", "value": "Edit file in place"},
+            {"label": "-n", "value": "Suppress automatic printing"},
+            {"label": "s/old/new/g", "value": "Substitute text globally"}
+          ]
+        },
+        {
+          "id": "awk",
+          "name": "awk",
+          "description": "Pattern scanning and text processing",
+          "content": {
+            "Command": "awk [options] 'pattern {action}' file",
+            "Purpose": "Process and analyze text data"
+          },
+          "examples": [
+            "awk '{print $1}' file.txt",
+            "awk -F: '{print $1}' /etc/passwd",
+            "awk 'NR==5' file.txt"
+          ],
+          "details": [
+            {"label": "-F", "value": "Set field separator"},
+            {"label": "NR", "value": "Number of records"},
+            {"label": "$1, $2", "value": "Field references"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "system-monitoring",
+      "name": "System Monitoring",
+      "entries": [
+        {
+          "id": "top",
+          "name": "top",
+          "description": "Display system processes and resource usage",
+          "content": {
+            "Command": "top [options]",
+            "Purpose": "Real-time process monitoring"
+          },
+          "examples": [
+            "top",
+            "top -u username",
+            "top -p 1234"
+          ],
+          "details": [
+            {"label": "-u", "value": "Show processes for specific user"},
+            {"label": "-p", "value": "Monitor specific PID"},
+            {"label": "-d", "value": "Set delay interval"}
+          ],
+          "notes": "Press 'q' to quit, 'k' to kill a process, 'M' to sort by memory"
+        },
+        {
+          "id": "ps",
+          "name": "ps",
+          "description": "Report process status",
+          "content": {
+            "Command": "ps [options]",
+            "Purpose": "Snapshot of current processes"
+          },
+          "examples": [
+            "ps aux",
+            "ps -ef",
+            "ps -u username"
+          ],
+          "details": [
+            {"label": "aux", "value": "Show all processes with details"},
+            {"label": "-ef", "value": "Full format listing"},
+            {"label": "-u", "value": "Show processes by user"}
+          ]
+        },
+        {
+          "id": "df",
+          "name": "df",
+          "description": "Display disk space usage",
+          "content": {
+            "Command": "df [options]",
+            "Purpose": "Show filesystem disk space"
+          },
+          "examples": [
+            "df -h",
+            "df -i",
+            "df -T"
+          ],
+          "details": [
+            {"label": "-h", "value": "Human-readable sizes"},
+            {"label": "-i", "value": "Show inode information"},
+            {"label": "-T", "value": "Show filesystem type"}
+          ]
+        },
+        {
+          "id": "free",
+          "name": "free",
+          "description": "Display memory usage",
+          "content": {
+            "Command": "free [options]",
+            "Purpose": "Show RAM and swap usage"
+          },
+          "examples": [
+            "free -h",
+            "free -m",
+            "free -s 5"
+          ],
+          "details": [
+            {"label": "-h", "value": "Human-readable output"},
+            {"label": "-m", "value": "Show in megabytes"},
+            {"label": "-s", "value": "Update every N seconds"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "permissions",
+      "name": "Permissions & Ownership",
+      "entries": [
+        {
+          "id": "chmod",
+          "name": "chmod",
+          "description": "Change file permissions",
+          "content": {
+            "Command": "chmod [mode] file",
+            "Purpose": "Modify file access permissions"
+          },
+          "examples": [
+            "chmod 755 script.sh",
+            "chmod +x file.sh",
+            "chmod -R 644 folder/"
+          ],
+          "details": [
+            {"label": "755", "value": "rwxr-xr-x (owner: rwx, group: r-x, others: r-x)"},
+            {"label": "644", "value": "rw-r--r-- (owner: rw, group: r, others: r)"},
+            {"label": "+x", "value": "Add execute permission"},
+            {"label": "-R", "value": "Recursive"}
+          ],
+          "notes": "755 = rwxr-xr-x (common for executables), 644 = rw-r--r-- (common for files)"
+        },
+        {
+          "id": "chown",
+          "name": "chown",
+          "description": "Change file owner and group",
+          "content": {
+            "Command": "chown [owner]:[group] file",
+            "Purpose": "Change file ownership"
+          },
+          "examples": [
+            "chown user:group file.txt",
+            "chown -R user:group folder/",
+            "chown user file.txt"
+          ],
+          "details": [
+            {"label": "-R", "value": "Recursive"},
+            {"label": "-v", "value": "Verbose output"}
+          ],
+          "notes": "Requires root privileges or file ownership"
+        }
+      ]
+    },
+    {
+      "id": "package-management",
+      "name": "Package Management",
+      "entries": [
+        {
+          "id": "apt",
+          "name": "apt",
+          "description": "Package manager for Debian/Ubuntu",
+          "content": {
+            "Command": "apt [command] [package]",
+            "Purpose": "Manage software packages",
+            "Distros": "Debian, Ubuntu, Linux Mint"
+          },
+          "examples": [
+            "sudo apt update",
+            "sudo apt upgrade",
+            "sudo apt install package-name",
+            "sudo apt remove package-name"
+          ],
+          "details": [
+            {"label": "update", "value": "Update package lists"},
+            {"label": "upgrade", "value": "Upgrade installed packages"},
+            {"label": "install", "value": "Install new package"},
+            {"label": "remove", "value": "Remove package"}
+          ],
+          "notes": "Most apt commands require sudo privileges"
+        },
+        {
+          "id": "yum",
+          "name": "yum",
+          "description": "Package manager for RHEL/CentOS",
+          "content": {
+            "Command": "yum [command] [package]",
+            "Purpose": "Manage software packages",
+            "Distros": "RHEL, CentOS, Fedora (older)"
+          },
+          "examples": [
+            "sudo yum update",
+            "sudo yum install package-name",
+            "sudo yum remove package-name",
+            "yum search keyword"
+          ],
+          "details": [
+            {"label": "update", "value": "Update all packages"},
+            {"label": "install", "value": "Install package"},
+            {"label": "remove", "value": "Remove package"},
+            {"label": "search", "value": "Search for package"}
+          ]
+        }
+      ]
+    }
+  ]
+}
