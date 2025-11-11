@@ -117,6 +117,123 @@
       ]
     },
     {
+      "id": "text-editors",
+      "name": "Text Editors",
+      "entries": [
+        {
+          "id": "nano",
+          "name": "nano",
+          "description": "Simple, user-friendly text editor",
+          "content": {
+            "Command": "nano [options] [file]",
+            "Purpose": "Edit text files in terminal"
+          },
+          "examples": [
+            "nano file.txt",
+            "nano +10 file.txt",
+            "nano -w file.conf"
+          ],
+          "details": [
+            {"label": "Ctrl+O", "value": "Save file (Write Out)"},
+            {"label": "Ctrl+X", "value": "Exit editor"},
+            {"label": "Ctrl+K", "value": "Cut line"},
+            {"label": "Ctrl+U", "value": "Paste line"},
+            {"label": "Ctrl+W", "value": "Search"},
+            {"label": "Ctrl+\\", "value": "Search and replace"},
+            {"label": "Ctrl+G", "value": "Show help"}
+          ],
+          "notes": "Best for beginners - shows keyboard shortcuts at bottom of screen"
+        },
+        {
+          "id": "vim",
+          "name": "vim",
+          "description": "Powerful modal text editor",
+          "content": {
+            "Command": "vim [options] [file]",
+            "Purpose": "Advanced text editing with modes"
+          },
+          "examples": [
+            "vim file.txt",
+            "vim +10 file.txt",
+            "vim -R file.txt"
+          ],
+          "details": [
+            {"label": "i", "value": "Enter insert mode"},
+            {"label": "Esc", "value": "Exit insert mode (back to normal mode)"},
+            {"label": ":w", "value": "Save file"},
+            {"label": ":q", "value": "Quit"},
+            {"label": ":wq", "value": "Save and quit"},
+            {"label": ":q!", "value": "Quit without saving"},
+            {"label": "dd", "value": "Delete line"},
+            {"label": "yy", "value": "Copy line"},
+            {"label": "p", "value": "Paste"},
+            {"label": "/pattern", "value": "Search forward"},
+            {"label": ":%s/old/new/g", "value": "Replace all occurrences"}
+          ],
+          "notes": "Steep learning curve but very powerful. Has three modes: Normal, Insert, and Visual"
+        },
+        {
+          "id": "vi",
+          "name": "vi",
+          "description": "Classic Unix text editor",
+          "content": {
+            "Command": "vi [file]",
+            "Purpose": "Basic modal text editor"
+          },
+          "examples": [
+            "vi file.txt",
+            "vi +10 file.txt"
+          ],
+          "details": [
+            {"label": "i", "value": "Enter insert mode"},
+            {"label": "Esc", "value": "Exit insert mode"},
+            {"label": ":w", "value": "Save file"},
+            {"label": ":q", "value": "Quit"},
+            {"label": ":wq", "value": "Save and quit"},
+            {"label": ":q!", "value": "Quit without saving"}
+          ],
+          "notes": "Available on virtually all Unix systems. Vim is an improved version of vi"
+        },
+        {
+          "id": "emacs",
+          "name": "emacs",
+          "description": "Extensible, customizable text editor",
+          "content": {
+            "Command": "emacs [options] [file]",
+            "Purpose": "Advanced text editor and IDE"
+          },
+          "examples": [
+            "emacs file.txt",
+            "emacs -nw file.txt"
+          ],
+          "details": [
+            {"label": "Ctrl+X Ctrl+S", "value": "Save file"},
+            {"label": "Ctrl+X Ctrl+C", "value": "Exit emacs"},
+            {"label": "Ctrl+X Ctrl+F", "value": "Open file"},
+            {"label": "Ctrl+K", "value": "Cut line"},
+            {"label": "Ctrl+Y", "value": "Paste"},
+            {"label": "Ctrl+S", "value": "Search forward"},
+            {"label": "Alt+X", "value": "Execute command"}
+          ],
+          "notes": "Highly extensible with Lisp. Can be used as an IDE, email client, and more"
+        },
+        {
+          "id": "gedit",
+          "name": "gedit",
+          "description": "GNOME text editor with GUI",
+          "content": {
+            "Command": "gedit [file]",
+            "Purpose": "Graphical text editor"
+          },
+          "examples": [
+            "gedit file.txt",
+            "gedit file1.txt file2.txt"
+          ],
+          "notes": "Simple graphical editor for GNOME desktop. Requires X11/Wayland display"
+        }
+      ]
+    },
+    {
       "id": "text-processing",
       "name": "Text Processing",
       "entries": [
