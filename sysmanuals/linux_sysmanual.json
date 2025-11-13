@@ -1,118 +1,529 @@
 {
   "id": "linux-sysmanual",
   "name": "Linux SysManual",
-  "description": "Essential Linux commands and tools for system administration and daily use",
+  "description": "Essential Linux commands and tools for system administration",
   "theme": {
     "primary": "#FFA500",
     "accent": "#333333"
   },
   "categories": [
     {
-      "id": "file-management",
-      "name": "File Management",
+      "id": "file-operations",
+      "name": "File Operations",
       "entries": [
         {
           "id": "ls",
           "name": "ls",
           "description": "List directory contents",
           "content": {
-            "Command": "ls [options] [path]",
-            "Purpose": "Display files and directories"
+            "Purpose": "View files and directories"
           },
           "examples": [
-            "ls -la",
-            "ls -lh /var/log",
-            "ls -R /etc"
+            {
+              "command": "ls",
+              "description": "List files in current directory"
+            },
+            {
+              "command": "ls -la",
+              "description": "Detailed list including hidden files"
+            },
+            {
+              "command": "ls -lh",
+              "description": "Human-readable file sizes (KB, MB, GB)"
+            },
+            {
+              "command": "ls -lt",
+              "description": "Sort by modification time (newest first)"
+            },
+            {
+              "command": "ls -R",
+              "description": "List all subdirectories recursively"
+            }
           ],
           "details": [
-            {"label": "-l", "value": "Use long listing format"},
-            {"label": "-a", "value": "Show hidden files"},
+            {"label": "-l", "value": "Long format (detailed info)"},
+            {"label": "-a", "value": "Show hidden files (starting with .)"},
             {"label": "-h", "value": "Human-readable sizes"},
-            {"label": "-R", "value": "List subdirectories recursively"},
-            {"label": "-t", "value": "Sort by modification time"}
+            {"label": "-t", "value": "Sort by time"},
+            {"label": "-R", "value": "Recursive"}
           ],
-          "notes": "Combine options like -lah for detailed, human-readable output with hidden files"
+          "notes": "Combine options: -lah shows detailed, human-readable list with hidden files"
+        },
+        {
+          "id": "cd",
+          "name": "cd",
+          "description": "Change directory",
+          "content": {
+            "Purpose": "Navigate between directories"
+          },
+          "examples": [
+            {
+              "command": "cd /var/log",
+              "description": "Go to specific directory"
+            },
+            {
+              "command": "cd ..",
+              "description": "Go up one directory level"
+            },
+            {
+              "command": "cd ~",
+              "description": "Go to home directory"
+            },
+            {
+              "command": "cd -",
+              "description": "Go to previous directory"
+            }
+          ],
+          "notes": "~ represents home directory, . is current directory, .. is parent directory"
+        },
+        {
+          "id": "pwd",
+          "name": "pwd",
+          "description": "Print working directory",
+          "content": {
+            "Purpose": "Show current directory path"
+          },
+          "examples": [
+            {
+              "command": "pwd",
+              "description": "Display full path of current directory"
+            }
+          ],
+          "notes": "Useful when you're lost in the directory structure"
         },
         {
           "id": "cp",
           "name": "cp",
           "description": "Copy files and directories",
           "content": {
-            "Command": "cp [options] source destination",
-            "Purpose": "Copy files or directories"
+            "Purpose": "Duplicate files or directories"
           },
           "examples": [
-            "cp file.txt /backup/",
-            "cp -r folder/ /backup/",
-            "cp -p file.txt file_backup.txt"
+            {
+              "command": "cp file.txt backup.txt",
+              "description": "Copy file to new name"
+            },
+            {
+              "command": "cp file.txt /backup/",
+              "description": "Copy file to another directory"
+            },
+            {
+              "command": "cp -r folder/ /backup/",
+              "description": "Copy entire directory recursively"
+            },
+            {
+              "command": "cp -p file.txt backup.txt",
+              "description": "Preserve file attributes (timestamps, permissions)"
+            }
           ],
           "details": [
-            {"label": "-r", "value": "Copy directories recursively"},
-            {"label": "-p", "value": "Preserve file attributes"},
-            {"label": "-v", "value": "Verbose output"},
-            {"label": "-i", "value": "Prompt before overwrite"}
-          ]
+            {"label": "-r", "value": "Recursive (for directories)"},
+            {"label": "-p", "value": "Preserve attributes"},
+            {"label": "-v", "value": "Verbose (show what's being copied)"},
+            {"label": "-i", "value": "Interactive (prompt before overwrite)"}
+          ],
+          "notes": "Always use -r when copying directories, or you'll get an error"
         },
         {
           "id": "mv",
           "name": "mv",
-          "description": "Move or rename files and directories",
+          "description": "Move or rename files",
           "content": {
-            "Command": "mv [options] source destination",
-            "Purpose": "Move or rename files/directories"
+            "Purpose": "Move files to new location or rename them"
           },
           "examples": [
-            "mv oldname.txt newname.txt",
-            "mv file.txt /new/location/",
-            "mv -i file.txt /backup/"
+            {
+              "command": "mv oldname.txt newname.txt",
+              "description": "Rename a file"
+            },
+            {
+              "command": "mv file.txt /new/location/",
+              "description": "Move file to different directory"
+            },
+            {
+              "command": "mv *.txt documents/",
+              "description": "Move all .txt files to documents folder"
+            }
           ],
           "details": [
-            {"label": "-i", "value": "Prompt before overwrite"},
+            {"label": "-i", "value": "Prompt before overwriting"},
             {"label": "-v", "value": "Verbose output"},
-            {"label": "-n", "value": "Don't overwrite existing files"}
-          ]
+            {"label": "-n", "value": "Never overwrite existing files"}
+          ],
+          "notes": "mv works across filesystems - cp then delete would be two operations"
         },
         {
           "id": "rm",
           "name": "rm",
           "description": "Remove files or directories",
           "content": {
-            "Command": "rm [options] file",
-            "Purpose": "Delete files or directories"
+            "Purpose": "Delete files permanently"
           },
           "examples": [
-            "rm file.txt",
-            "rm -rf directory/",
-            "rm -i *.log"
+            {
+              "command": "rm file.txt",
+              "description": "Delete a single file"
+            },
+            {
+              "command": "rm -i *.log",
+              "description": "Delete all .log files with confirmation"
+            },
+            {
+              "command": "rm -r directory/",
+              "description": "Delete directory and all contents"
+            },
+            {
+              "command": "rm -rf directory/",
+              "description": "Force delete without prompts (DANGEROUS!)"
+            }
           ],
           "details": [
-            {"label": "-r", "value": "Remove directories recursively"},
-            {"label": "-f", "value": "Force removal without prompting"},
-            {"label": "-i", "value": "Prompt before removal"},
-            {"label": "-v", "value": "Verbose output"}
+            {"label": "-r", "value": "Recursive (for directories)"},
+            {"label": "-f", "value": "Force (no prompts or warnings)"},
+            {"label": "-i", "value": "Interactive (confirm each deletion)"},
+            {"label": "-v", "value": "Verbose (show what's deleted)"}
           ],
-          "notes": "WARNING: Use with caution! Deleted files cannot be recovered easily"
+          "notes": "⚠️ DANGER: No undo! Files are permanently deleted. Never run 'rm -rf /' as root!"
+        },
+        {
+          "id": "mkdir",
+          "name": "mkdir",
+          "description": "Create directories",
+          "content": {
+            "Purpose": "Make new directories"
+          },
+          "examples": [
+            {
+              "command": "mkdir newdir",
+              "description": "Create a single directory"
+            },
+            {
+              "command": "mkdir -p path/to/nested/dir",
+              "description": "Create nested directories (parent directories too)"
+            },
+            {
+              "command": "mkdir dir1 dir2 dir3",
+              "description": "Create multiple directories at once"
+            }
+          ],
+          "details": [
+            {"label": "-p", "value": "Create parent directories if needed"},
+            {"label": "-v", "value": "Verbose (show what's created)"}
+          ],
+          "notes": "Use -p to avoid errors when parent directories don't exist"
+        },
+        {
+          "id": "touch",
+          "name": "touch",
+          "description": "Create empty files or update timestamps",
+          "content": {
+            "Purpose": "Create new empty files"
+          },
+          "examples": [
+            {
+              "command": "touch newfile.txt",
+              "description": "Create an empty file"
+            },
+            {
+              "command": "touch file1.txt file2.txt file3.txt",
+              "description": "Create multiple files at once"
+            },
+            {
+              "command": "touch existing.txt",
+              "description": "Update modification time of existing file"
+            }
+          ],
+          "notes": "If file exists, touch only updates the timestamp without changing content"
+        }
+      ]
+    },
+    {
+      "id": "file-viewing",
+      "name": "Viewing File Contents",
+      "entries": [
+        {
+          "id": "cat",
+          "name": "cat",
+          "description": "Display entire file contents",
+          "content": {
+            "Purpose": "Show file content on screen"
+          },
+          "examples": [
+            {
+              "command": "cat file.txt",
+              "description": "Display entire file"
+            },
+            {
+              "command": "cat file1.txt file2.txt",
+              "description": "Display multiple files in sequence"
+            },
+            {
+              "command": "cat file.txt | grep 'error'",
+              "description": "Display file and search for text"
+            }
+          ],
+          "notes": "Good for small files - for large files use 'less' or 'head/tail'"
+        },
+        {
+          "id": "less",
+          "name": "less",
+          "description": "View files page by page (recommended)",
+          "content": {
+            "Purpose": "Navigate through large files"
+          },
+          "examples": [
+            {
+              "command": "less /var/log/syslog",
+              "description": "View log file with scrolling"
+            },
+            {
+              "command": "less +F /var/log/syslog",
+              "description": "Follow file (like tail -f)"
+            }
+          ],
+          "details": [
+            {"label": "Space", "value": "Next page"},
+            {"label": "b", "value": "Previous page"},
+            {"label": "/pattern", "value": "Search forward"},
+            {"label": "q", "value": "Quit"},
+            {"label": "G", "value": "Go to end of file"}
+          ],
+          "notes": "Better than 'more' - allows backward scrolling and searching"
+        },
+        {
+          "id": "head",
+          "name": "head",
+          "description": "Show first lines of file",
+          "content": {
+            "Purpose": "View beginning of files"
+          },
+          "examples": [
+            {
+              "command": "head file.txt",
+              "description": "Show first 10 lines (default)"
+            },
+            {
+              "command": "head -n 20 file.txt",
+              "description": "Show first 20 lines"
+            },
+            {
+              "command": "head -n 5 *.log",
+              "description": "Show first 5 lines of all log files"
+            }
+          ],
+          "details": [
+            {"label": "-n N", "value": "Show first N lines"},
+            {"label": "-c N", "value": "Show first N bytes"}
+          ],
+          "notes": "Useful for quickly checking file format or headers"
+        },
+        {
+          "id": "tail",
+          "name": "tail",
+          "description": "Show last lines of file",
+          "content": {
+            "Purpose": "View end of files or follow logs"
+          },
+          "examples": [
+            {
+              "command": "tail file.txt",
+              "description": "Show last 10 lines (default)"
+            },
+            {
+              "command": "tail -n 50 /var/log/syslog",
+              "description": "Show last 50 lines of log"
+            },
+            {
+              "command": "tail -f /var/log/syslog",
+              "description": "Follow log in real-time (live updates)"
+            },
+            {
+              "command": "tail -f /var/log/apache2/access.log",
+              "description": "Monitor web server access in real-time"
+            }
+          ],
+          "details": [
+            {"label": "-n N", "value": "Show last N lines"},
+            {"label": "-f", "value": "Follow file (show new lines as added)"},
+            {"label": "-F", "value": "Follow and retry (handles log rotation)"}
+          ],
+          "notes": "tail -f is essential for monitoring logs - press Ctrl+C to stop following"
+        }
+      ]
+    },
+    {
+      "id": "text-search",
+      "name": "Searching & Text Processing",
+      "entries": [
+        {
+          "id": "grep",
+          "name": "grep",
+          "description": "Search for text patterns in files",
+          "content": {
+            "Purpose": "Find text matching patterns"
+          },
+          "examples": [
+            {
+              "command": "grep 'error' logfile.txt",
+              "description": "Find all lines containing 'error'"
+            },
+            {
+              "command": "grep -i 'warning' file.txt",
+              "description": "Case-insensitive search"
+            },
+            {
+              "command": "grep -r 'TODO' ./src/",
+              "description": "Recursively search all files in directory"
+            },
+            {
+              "command": "grep -n 'function' script.py",
+              "description": "Show line numbers with matches"
+            },
+            {
+              "command": "grep -v 'debug' log.txt",
+              "description": "Show lines NOT containing 'debug'"
+            }
+          ],
+          "details": [
+            {"label": "-i", "value": "Ignore case"},
+            {"label": "-r", "value": "Recursive search in directories"},
+            {"label": "-n", "value": "Show line numbers"},
+            {"label": "-v", "value": "Invert match (show non-matching lines)"},
+            {"label": "-c", "value": "Count matching lines"}
+          ],
+          "notes": "One of the most useful commands - essential for log analysis"
         },
         {
           "id": "find",
           "name": "find",
-          "description": "Search for files and directories",
+          "description": "Search for files by name, size, date, etc.",
           "content": {
-            "Command": "find [path] [options]",
-            "Purpose": "Locate files matching criteria"
+            "Purpose": "Locate files in directory tree"
           },
           "examples": [
-            "find . -name '*.txt'",
-            "find /home -type f -size +100M",
-            "find . -mtime -7"
+            {
+              "command": "find . -name '*.txt'",
+              "description": "Find all .txt files in current directory tree"
+            },
+            {
+              "command": "find /home -type f -size +100M",
+              "description": "Find files larger than 100MB"
+            },
+            {
+              "command": "find . -mtime -7",
+              "description": "Find files modified in last 7 days"
+            },
+            {
+              "command": "find . -name '*.log' -delete",
+              "description": "Find and delete all .log files"
+            },
+            {
+              "command": "find . -type d -name 'temp'",
+              "description": "Find directories named 'temp'"
+            }
           ],
           "details": [
-            {"label": "-name", "value": "Search by filename pattern"},
-            {"label": "-type f", "value": "Find only files"},
-            {"label": "-type d", "value": "Find only directories"},
-            {"label": "-size", "value": "Search by file size"},
-            {"label": "-mtime", "value": "Search by modification time"}
-          ]
+            {"label": "-name pattern", "value": "Search by filename"},
+            {"label": "-type f/d", "value": "Find files (f) or directories (d)"},
+            {"label": "-size +N", "value": "Larger than size (use -N for smaller)"},
+            {"label": "-mtime N", "value": "Modified N days ago (-N = within N days)"},
+            {"label": "-delete", "value": "Delete found files"}
+          ],
+          "notes": "Very powerful - be careful with -delete option, test search first!"
+        },
+        {
+          "id": "sed",
+          "name": "sed",
+          "description": "Stream editor for text manipulation",
+          "content": {
+            "Purpose": "Find and replace text, edit files"
+          },
+          "examples": [
+            {
+              "command": "sed 's/old/new/g' file.txt",
+              "description": "Replace all 'old' with 'new' (display only)"
+            },
+            {
+              "command": "sed -i 's/foo/bar/g' file.txt",
+              "description": "Replace in file directly (in-place edit)"
+            },
+            {
+              "command": "sed -n '10,20p' file.txt",
+              "description": "Print only lines 10-20"
+            },
+            {
+              "command": "sed '/^#/d' file.txt",
+              "description": "Delete all comment lines (starting with #)"
+            }
+          ],
+          "details": [
+            {"label": "s/old/new/g", "value": "Substitute (g = global, all occurrences)"},
+            {"label": "-i", "value": "Edit file in-place"},
+            {"label": "-n", "value": "Suppress output (use with p command)"},
+            {"label": "d", "value": "Delete matching lines"}
+          ],
+          "notes": "Powerful for batch text transformations - test without -i first!"
+        },
+        {
+          "id": "awk",
+          "name": "awk",
+          "description": "Pattern scanning and text processing",
+          "content": {
+            "Purpose": "Process columns and fields in text"
+          },
+          "examples": [
+            {
+              "command": "awk '{print $1}' file.txt",
+              "description": "Print first column from each line"
+            },
+            {
+              "command": "awk -F: '{print $1}' /etc/passwd",
+              "description": "Use colon as separator, print usernames"
+            },
+            {
+              "command": "awk '$3 > 100' data.txt",
+              "description": "Print lines where 3rd column > 100"
+            },
+            {
+              "command": "awk 'NR==5' file.txt",
+              "description": "Print only line 5"
+            }
+          ],
+          "details": [
+            {"label": "$1, $2, $3", "value": "Column references (fields)"},
+            {"label": "-F", "value": "Set field separator"},
+            {"label": "NR", "value": "Line number (record number)"},
+            {"label": "NF", "value": "Number of fields in current line"}
+          ],
+          "notes": "Best for working with columnar data like logs, CSV files, or command output"
+        },
+        {
+          "id": "wc",
+          "name": "wc",
+          "description": "Word count - count lines, words, characters",
+          "content": {
+            "Purpose": "Count elements in files"
+          },
+          "examples": [
+            {
+              "command": "wc file.txt",
+              "description": "Show lines, words, and characters"
+            },
+            {
+              "command": "wc -l file.txt",
+              "description": "Count only lines"
+            },
+            {
+              "command": "find . -name '*.py' | wc -l",
+              "description": "Count number of Python files"
+            }
+          ],
+          "details": [
+            {"label": "-l", "value": "Count lines only"},
+            {"label": "-w", "value": "Count words only"},
+            {"label": "-c", "value": "Count characters only"}
+          ],
+          "notes": "Often combined with pipes to count results from other commands"
         }
       ]
     },
@@ -123,43 +534,52 @@
         {
           "id": "nano",
           "name": "nano",
-          "description": "Simple, user-friendly text editor",
+          "description": "Simple, beginner-friendly text editor",
           "content": {
-            "Command": "nano [options] [file]",
-            "Purpose": "Edit text files in terminal"
+            "Difficulty": "Easy - best for beginners",
+            "Interface": "Shows keyboard shortcuts on screen"
           },
           "examples": [
-            "nano file.txt",
-            "nano +10 file.txt",
-            "nano -w file.conf"
+            {
+              "command": "nano file.txt",
+              "description": "Open or create file for editing"
+            },
+            {
+              "command": "nano +10 file.txt",
+              "description": "Open file at line 10"
+            }
           ],
           "details": [
-            {"label": "Ctrl+O", "value": "Save file (Write Out)"},
-            {"label": "Ctrl+X", "value": "Exit editor"},
+            {"label": "Ctrl+O", "value": "Save (Write Out)"},
+            {"label": "Ctrl+X", "value": "Exit"},
             {"label": "Ctrl+K", "value": "Cut line"},
-            {"label": "Ctrl+U", "value": "Paste line"},
+            {"label": "Ctrl+U", "value": "Paste"},
             {"label": "Ctrl+W", "value": "Search"},
-            {"label": "Ctrl+\\", "value": "Search and replace"},
-            {"label": "Ctrl+G", "value": "Show help"}
+            {"label": "Ctrl+\\", "value": "Find and replace"}
           ],
-          "notes": "Best for beginners - shows keyboard shortcuts at bottom of screen"
+          "notes": "Recommended for beginners - shows all commands at bottom of screen"
         },
         {
           "id": "vim",
           "name": "vim",
-          "description": "Powerful modal text editor",
+          "description": "Powerful modal editor (advanced)",
           "content": {
-            "Command": "vim [options] [file]",
-            "Purpose": "Advanced text editing with modes"
+            "Difficulty": "Advanced - steep learning curve",
+            "Modes": "Normal, Insert, Visual, Command"
           },
           "examples": [
-            "vim file.txt",
-            "vim +10 file.txt",
-            "vim -R file.txt"
+            {
+              "command": "vim file.txt",
+              "description": "Open file (starts in Normal mode)"
+            },
+            {
+              "command": "vimtutor",
+              "description": "Interactive Vim tutorial (highly recommended!)"
+            }
           ],
           "details": [
-            {"label": "i", "value": "Enter insert mode"},
-            {"label": "Esc", "value": "Exit insert mode (back to normal mode)"},
+            {"label": "i", "value": "Enter Insert mode (start typing)"},
+            {"label": "Esc", "value": "Return to Normal mode"},
             {"label": ":w", "value": "Save file"},
             {"label": ":q", "value": "Quit"},
             {"label": ":wq", "value": "Save and quit"},
@@ -167,217 +587,9 @@
             {"label": "dd", "value": "Delete line"},
             {"label": "yy", "value": "Copy line"},
             {"label": "p", "value": "Paste"},
-            {"label": "/pattern", "value": "Search forward"},
-            {"label": ":%s/old/new/g", "value": "Replace all occurrences"}
+            {"label": "/text", "value": "Search forward for 'text'"}
           ],
-          "notes": "Steep learning curve but very powerful. Has three modes: Normal, Insert, and Visual"
-        },
-        {
-          "id": "vi",
-          "name": "vi",
-          "description": "Classic Unix text editor",
-          "content": {
-            "Command": "vi [file]",
-            "Purpose": "Basic modal text editor"
-          },
-          "examples": [
-            "vi file.txt",
-            "vi +10 file.txt"
-          ],
-          "details": [
-            {"label": "i", "value": "Enter insert mode"},
-            {"label": "Esc", "value": "Exit insert mode"},
-            {"label": ":w", "value": "Save file"},
-            {"label": ":q", "value": "Quit"},
-            {"label": ":wq", "value": "Save and quit"},
-            {"label": ":q!", "value": "Quit without saving"}
-          ],
-          "notes": "Available on virtually all Unix systems. Vim is an improved version of vi"
-        },
-        {
-          "id": "emacs",
-          "name": "emacs",
-          "description": "Extensible, customizable text editor",
-          "content": {
-            "Command": "emacs [options] [file]",
-            "Purpose": "Advanced text editor and IDE"
-          },
-          "examples": [
-            "emacs file.txt",
-            "emacs -nw file.txt"
-          ],
-          "details": [
-            {"label": "Ctrl+X Ctrl+S", "value": "Save file"},
-            {"label": "Ctrl+X Ctrl+C", "value": "Exit emacs"},
-            {"label": "Ctrl+X Ctrl+F", "value": "Open file"},
-            {"label": "Ctrl+K", "value": "Cut line"},
-            {"label": "Ctrl+Y", "value": "Paste"},
-            {"label": "Ctrl+S", "value": "Search forward"},
-            {"label": "Alt+X", "value": "Execute command"}
-          ],
-          "notes": "Highly extensible with Lisp. Can be used as an IDE, email client, and more"
-        },
-        {
-          "id": "gedit",
-          "name": "gedit",
-          "description": "GNOME text editor with GUI",
-          "content": {
-            "Command": "gedit [file]",
-            "Purpose": "Graphical text editor"
-          },
-          "examples": [
-            "gedit file.txt",
-            "gedit file1.txt file2.txt"
-          ],
-          "notes": "Simple graphical editor for GNOME desktop. Requires X11/Wayland display"
-        }
-      ]
-    },
-    {
-      "id": "text-processing",
-      "name": "Text Processing",
-      "entries": [
-        {
-          "id": "grep",
-          "name": "grep",
-          "description": "Search text patterns in files",
-          "content": {
-            "Command": "grep [options] pattern [file]",
-            "Purpose": "Find text matching patterns"
-          },
-          "examples": [
-            "grep 'error' logfile.txt",
-            "grep -r 'TODO' ./src/",
-            "grep -i 'warning' *.log"
-          ],
-          "details": [
-            {"label": "-i", "value": "Ignore case"},
-            {"label": "-r", "value": "Recursive search"},
-            {"label": "-v", "value": "Invert match"},
-            {"label": "-n", "value": "Show line numbers"},
-            {"label": "-c", "value": "Count matches"}
-          ]
-        },
-        {
-          "id": "sed",
-          "name": "sed",
-          "description": "Stream editor for text manipulation",
-          "content": {
-            "Command": "sed [options] 'command' file",
-            "Purpose": "Transform and filter text"
-          },
-          "examples": [
-            "sed 's/old/new/g' file.txt",
-            "sed -i 's/foo/bar/g' file.txt",
-            "sed -n '10,20p' file.txt"
-          ],
-          "details": [
-            {"label": "-i", "value": "Edit file in place"},
-            {"label": "-n", "value": "Suppress automatic printing"},
-            {"label": "s/old/new/g", "value": "Substitute text globally"}
-          ]
-        },
-        {
-          "id": "awk",
-          "name": "awk",
-          "description": "Pattern scanning and text processing",
-          "content": {
-            "Command": "awk [options] 'pattern {action}' file",
-            "Purpose": "Process and analyze text data"
-          },
-          "examples": [
-            "awk '{print $1}' file.txt",
-            "awk -F: '{print $1}' /etc/passwd",
-            "awk 'NR==5' file.txt"
-          ],
-          "details": [
-            {"label": "-F", "value": "Set field separator"},
-            {"label": "NR", "value": "Number of records"},
-            {"label": "$1, $2", "value": "Field references"}
-          ]
-        }
-      ]
-    },
-    {
-      "id": "system-monitoring",
-      "name": "System Monitoring",
-      "entries": [
-        {
-          "id": "top",
-          "name": "top",
-          "description": "Display system processes and resource usage",
-          "content": {
-            "Command": "top [options]",
-            "Purpose": "Real-time process monitoring"
-          },
-          "examples": [
-            "top",
-            "top -u username",
-            "top -p 1234"
-          ],
-          "details": [
-            {"label": "-u", "value": "Show processes for specific user"},
-            {"label": "-p", "value": "Monitor specific PID"},
-            {"label": "-d", "value": "Set delay interval"}
-          ],
-          "notes": "Press 'q' to quit, 'k' to kill a process, 'M' to sort by memory"
-        },
-        {
-          "id": "ps",
-          "name": "ps",
-          "description": "Report process status",
-          "content": {
-            "Command": "ps [options]",
-            "Purpose": "Snapshot of current processes"
-          },
-          "examples": [
-            "ps aux",
-            "ps -ef",
-            "ps -u username"
-          ],
-          "details": [
-            {"label": "aux", "value": "Show all processes with details"},
-            {"label": "-ef", "value": "Full format listing"},
-            {"label": "-u", "value": "Show processes by user"}
-          ]
-        },
-        {
-          "id": "df",
-          "name": "df",
-          "description": "Display disk space usage",
-          "content": {
-            "Command": "df [options]",
-            "Purpose": "Show filesystem disk space"
-          },
-          "examples": [
-            "df -h",
-            "df -i",
-            "df -T"
-          ],
-          "details": [
-            {"label": "-h", "value": "Human-readable sizes"},
-            {"label": "-i", "value": "Show inode information"},
-            {"label": "-T", "value": "Show filesystem type"}
-          ]
-        },
-        {
-          "id": "free",
-          "name": "free",
-          "description": "Display memory usage",
-          "content": {
-            "Command": "free [options]",
-            "Purpose": "Show RAM and swap usage"
-          },
-          "examples": [
-            "free -h",
-            "free -m",
-            "free -s 5"
-          ],
-          "details": [
-            {"label": "-h", "value": "Human-readable output"},
-            {"label": "-m", "value": "Show in megabytes"},
-            {"label": "-s", "value": "Update every N seconds"}
-          ]
+          "notes": "Very powerful but takes time to learn - run 'vimtutor' to learn basics"
         }
       ]
     },
@@ -388,42 +600,429 @@
         {
           "id": "chmod",
           "name": "chmod",
-          "description": "Change file permissions",
+          "description": "Change file permissions (read, write, execute)",
           "content": {
-            "Command": "chmod [mode] file",
-            "Purpose": "Modify file access permissions"
+            "Purpose": "Control who can access files",
+            "Format": "Owner | Group | Others"
           },
           "examples": [
-            "chmod 755 script.sh",
-            "chmod +x file.sh",
-            "chmod -R 644 folder/"
+            {
+              "command": "chmod 755 script.sh",
+              "description": "Owner: all, Group/Others: read+execute (rwxr-xr-x)"
+            },
+            {
+              "command": "chmod 644 file.txt",
+              "description": "Owner: read+write, Group/Others: read only (rw-r--r--)"
+            },
+            {
+              "command": "chmod +x script.sh",
+              "description": "Add execute permission for everyone"
+            },
+            {
+              "command": "chmod -x file.txt",
+              "description": "Remove execute permission"
+            },
+            {
+              "command": "chmod -R 755 directory/",
+              "description": "Recursively set permissions on all files"
+            }
           ],
           "details": [
-            {"label": "755", "value": "rwxr-xr-x (owner: rwx, group: r-x, others: r-x)"},
-            {"label": "644", "value": "rw-r--r-- (owner: rw, group: r, others: r)"},
+            {"label": "7 (rwx)", "value": "Read + Write + Execute"},
+            {"label": "6 (rw-)", "value": "Read + Write"},
+            {"label": "5 (r-x)", "value": "Read + Execute"},
+            {"label": "4 (r--)", "value": "Read only"},
             {"label": "+x", "value": "Add execute permission"},
-            {"label": "-R", "value": "Recursive"}
+            {"label": "-R", "value": "Recursive (apply to all files in directory)"}
           ],
-          "notes": "755 = rwxr-xr-x (common for executables), 644 = rw-r--r-- (common for files)"
+          "notes": "755 for scripts/programs, 644 for regular files, 700 for private files"
         },
         {
           "id": "chown",
           "name": "chown",
           "description": "Change file owner and group",
           "content": {
-            "Command": "chown [owner]:[group] file",
-            "Purpose": "Change file ownership"
+            "Purpose": "Transfer file ownership",
+            "Requires": "Root/sudo privileges"
           },
           "examples": [
-            "chown user:group file.txt",
-            "chown -R user:group folder/",
-            "chown user file.txt"
+            {
+              "command": "sudo chown user file.txt",
+              "description": "Change owner to 'user'"
+            },
+            {
+              "command": "sudo chown user:group file.txt",
+              "description": "Change both owner and group"
+            },
+            {
+              "command": "sudo chown -R user:group directory/",
+              "description": "Recursively change ownership"
+            }
           ],
           "details": [
-            {"label": "-R", "value": "Recursive"},
-            {"label": "-v", "value": "Verbose output"}
+            {"label": "-R", "value": "Recursive (all files in directory)"},
+            {"label": "-v", "value": "Verbose (show what's changed)"}
           ],
-          "notes": "Requires root privileges or file ownership"
+          "notes": "Usually requires sudo - be careful with recursive operations"
+        },
+        {
+          "id": "umask",
+          "name": "umask",
+          "description": "Set default file permissions for new files",
+          "content": {
+            "Purpose": "Control default permissions on creation"
+          },
+          "examples": [
+            {
+              "command": "umask",
+              "description": "Show current umask value"
+            },
+            {
+              "command": "umask 022",
+              "description": "Set default permissions (files: 644, dirs: 755)"
+            }
+          ],
+          "notes": "umask subtracts from 666 (files) or 777 (dirs) - e.g., umask 022 gives 644 for files"
+        }
+      ]
+    },
+    {
+      "id": "system-monitoring",
+      "name": "System Monitoring",
+      "entries": [
+        {
+          "id": "top",
+          "name": "top",
+          "description": "Real-time system resource monitor",
+          "content": {
+            "Purpose": "View CPU, memory, and process usage"
+          },
+          "examples": [
+            {
+              "command": "top",
+              "description": "Live view of system processes"
+            },
+            {
+              "command": "top -u username",
+              "description": "Show only specific user's processes"
+            }
+          ],
+          "details": [
+            {"label": "q", "value": "Quit"},
+            {"label": "k", "value": "Kill process (enter PID)"},
+            {"label": "M", "value": "Sort by memory usage"},
+            {"label": "P", "value": "Sort by CPU usage"},
+            {"label": "1", "value": "Show individual CPU cores"}
+          ],
+          "notes": "Press 'h' inside top for help. Look at load average and memory usage"
+        },
+        {
+          "id": "htop",
+          "name": "htop",
+          "description": "Better alternative to top (if installed)",
+          "content": {
+            "Purpose": "User-friendly process monitor with colors"
+          },
+          "examples": [
+            {
+              "command": "htop",
+              "description": "Interactive process viewer"
+            }
+          ],
+          "details": [
+            {"label": "F6", "value": "Change sort column"},
+            {"label": "F9", "value": "Kill process"},
+            {"label": "F10/q", "value": "Quit"},
+            {"label": "Space", "value": "Tag process"}
+          ],
+          "notes": "Much easier to use than top - shows CPU bars and uses mouse support"
+        },
+        {
+          "id": "ps",
+          "name": "ps",
+          "description": "Snapshot of running processes",
+          "content": {
+            "Purpose": "List current processes"
+          },
+          "examples": [
+            {
+              "command": "ps aux",
+              "description": "Show all processes with details"
+            },
+            {
+              "command": "ps aux | grep nginx",
+              "description": "Find specific process"
+            },
+            {
+              "command": "ps -ef",
+              "description": "Full format listing (Unix style)"
+            },
+            {
+              "command": "ps -u username",
+              "description": "Show processes for specific user"
+            }
+          ],
+          "details": [
+            {"label": "aux", "value": "All users, detailed info (BSD style)"},
+            {"label": "-ef", "value": "Every process, full format (Unix style)"},
+            {"label": "-u user", "value": "Filter by username"}
+          ],
+          "notes": "Use with grep to find specific processes: ps aux | grep processname"
+        },
+        {
+          "id": "kill",
+          "name": "kill",
+          "description": "Terminate processes",
+          "content": {
+            "Purpose": "Stop running processes"
+          },
+          "examples": [
+            {
+              "command": "kill 1234",
+              "description": "Gracefully stop process with PID 1234"
+            },
+            {
+              "command": "kill -9 1234",
+              "description": "Force kill process immediately (SIGKILL)"
+            },
+            {
+              "command": "killall nginx",
+              "description": "Kill all processes named 'nginx'"
+            },
+            {
+              "command": "pkill -f python",
+              "description": "Kill processes matching pattern"
+            }
+          ],
+          "details": [
+            {"label": "kill PID", "value": "Send SIGTERM (graceful shutdown)"},
+            {"label": "kill -9 PID", "value": "Send SIGKILL (force kill)"},
+            {"label": "killall name", "value": "Kill all processes by name"},
+            {"label": "pkill pattern", "value": "Kill by pattern matching"}
+          ],
+          "notes": "Try normal kill first - use kill -9 only if process won't stop"
+        },
+        {
+          "id": "df",
+          "name": "df",
+          "description": "Disk filesystem usage",
+          "content": {
+            "Purpose": "Check disk space"
+          },
+          "examples": [
+            {
+              "command": "df -h",
+              "description": "Show disk usage in human-readable format"
+            },
+            {
+              "command": "df -i",
+              "description": "Show inode usage (file count limits)"
+            },
+            {
+              "command": "df -h /home",
+              "description": "Show space for specific filesystem"
+            }
+          ],
+          "details": [
+            {"label": "-h", "value": "Human-readable sizes (GB, MB)"},
+            {"label": "-i", "value": "Show inode information"},
+            {"label": "-T", "value": "Show filesystem type"}
+          ],
+          "notes": "Watch for filesystems near 100% - can cause system problems"
+        },
+        {
+          "id": "du",
+          "name": "du",
+          "description": "Disk usage by directory",
+          "content": {
+            "Purpose": "Find which directories use most space"
+          },
+          "examples": [
+            {
+              "command": "du -sh *",
+              "description": "Show size of each item in current directory"
+            },
+            {
+              "command": "du -h --max-depth=1 /var",
+              "description": "Show top-level directory sizes"
+            },
+            {
+              "command": "du -sh /home/user | sort -h",
+              "description": "Find largest directories"
+            }
+          ],
+          "details": [
+            {"label": "-s", "value": "Summary (total only)"},
+            {"label": "-h", "value": "Human-readable"},
+            {"label": "--max-depth=N", "value": "Limit directory depth"}
+          ],
+          "notes": "Use to find space hogs: du -sh /* | sort -h to see largest directories"
+        },
+        {
+          "id": "free",
+          "name": "free",
+          "description": "Memory usage statistics",
+          "content": {
+            "Purpose": "Show RAM and swap usage"
+          },
+          "examples": [
+            {
+              "command": "free -h",
+              "description": "Show memory in human-readable format"
+            },
+            {
+              "command": "free -m",
+              "description": "Show memory in megabytes"
+            },
+            {
+              "command": "free -s 5",
+              "description": "Update every 5 seconds"
+            }
+          ],
+          "details": [
+            {"label": "-h", "value": "Human-readable (GB, MB)"},
+            {"label": "-m", "value": "Show in megabytes"},
+            {"label": "-s N", "value": "Update every N seconds"}
+          ],
+          "notes": "Don't worry if 'available' memory is low - Linux uses free RAM for cache"
+        }
+      ]
+    },
+    {
+      "id": "user-management",
+      "name": "User & Group Management",
+      "entries": [
+        {
+          "id": "useradd",
+          "name": "useradd / adduser",
+          "description": "Create new user accounts",
+          "content": {
+            "Purpose": "Add users to system",
+            "Requires": "Root/sudo privileges"
+          },
+          "examples": [
+            {
+              "command": "sudo adduser newuser",
+              "description": "Interactive user creation (recommended on Ubuntu/Debian)"
+            },
+            {
+              "command": "sudo useradd -m -s /bin/bash newuser",
+              "description": "Create user with home directory and bash shell"
+            },
+            {
+              "command": "sudo passwd newuser",
+              "description": "Set password for user"
+            }
+          ],
+          "details": [
+            {"label": "-m", "value": "Create home directory"},
+            {"label": "-s shell", "value": "Set login shell"},
+            {"label": "-G group", "value": "Add to additional groups"}
+          ],
+          "notes": "Use 'adduser' on Debian/Ubuntu (interactive), 'useradd' on RedHat/CentOS"
+        },
+        {
+          "id": "usermod",
+          "name": "usermod",
+          "description": "Modify existing user accounts",
+          "content": {
+            "Purpose": "Change user properties",
+            "Requires": "Root/sudo privileges"
+          },
+          "examples": [
+            {
+              "command": "sudo usermod -aG sudo username",
+              "description": "Add user to sudo group (grant admin rights)"
+            },
+            {
+              "command": "sudo usermod -l newname oldname",
+              "description": "Rename user account"
+            },
+            {
+              "command": "sudo usermod -s /bin/bash username",
+              "description": "Change user's shell"
+            }
+          ],
+          "details": [
+            {"label": "-aG group", "value": "Append to group (don't remove from others)"},
+            {"label": "-l newname", "value": "Change username"},
+            {"label": "-L", "value": "Lock account (disable login)"}
+          ],
+          "notes": "Always use -a with -G or you'll remove user from other groups!"
+        },
+        {
+          "id": "userdel",
+          "name": "userdel",
+          "description": "Delete user accounts",
+          "content": {
+            "Purpose": "Remove users from system",
+            "Requires": "Root/sudo privileges"
+          },
+          "examples": [
+            {
+              "command": "sudo userdel username",
+              "description": "Delete user (keeps home directory)"
+            },
+            {
+              "command": "sudo userdel -r username",
+              "description": "Delete user and remove home directory"
+            }
+          ],
+          "details": [
+            {"label": "-r", "value": "Remove home directory and mail spool"}
+          ],
+          "notes": "Backup important data before using -r!"
+        },
+        {
+          "id": "groups",
+          "name": "groups",
+          "description": "Show user group memberships",
+          "content": {
+            "Purpose": "List groups user belongs to"
+          },
+          "examples": [
+            {
+              "command": "groups",
+              "description": "Show current user's groups"
+            },
+            {
+              "command": "groups username",
+              "description": "Show another user's groups"
+            }
+          ],
+          "notes": "Groups control file access permissions - common groups: sudo, docker, www-data"
+        },
+        {
+          "id": "sudo",
+          "name": "sudo",
+          "description": "Execute commands as another user (usually root)",
+          "content": {
+            "Purpose": "Run commands with elevated privileges"
+          },
+          "examples": [
+            {
+              "command": "sudo apt update",
+              "description": "Run command as root"
+            },
+            {
+              "command": "sudo -i",
+              "description": "Start root shell session"
+            },
+            {
+              "command": "sudo -u username command",
+              "description": "Run command as different user"
+            },
+            {
+              "command": "sudo !!",
+              "description": "Re-run previous command with sudo"
+            }
+          ],
+          "details": [
+            {"label": "-i", "value": "Start login shell as root"},
+            {"label": "-u user", "value": "Run as specific user"},
+            {"label": "-l", "value": "List allowed commands"}
+          ],
+          "notes": "Safer than logging in as root - user must be in sudo group"
         }
       ]
     },
@@ -433,48 +1032,397 @@
       "entries": [
         {
           "id": "apt",
-          "name": "apt",
-          "description": "Package manager for Debian/Ubuntu",
+          "name": "apt (Debian/Ubuntu)",
+          "description": "Package manager for Debian-based systems",
           "content": {
-            "Command": "apt [command] [package]",
-            "Purpose": "Manage software packages",
-            "Distros": "Debian, Ubuntu, Linux Mint"
+            "Distros": "Ubuntu, Debian, Linux Mint, Pop!_OS",
+            "Purpose": "Install, update, and remove software"
           },
           "examples": [
-            "sudo apt update",
-            "sudo apt upgrade",
-            "sudo apt install package-name",
-            "sudo apt remove package-name"
+            {
+              "command": "sudo apt update",
+              "description": "Update package list from repositories (always run first!)"
+            },
+            {
+              "command": "sudo apt upgrade",
+              "description": "Upgrade all installed packages"
+            },
+            {
+              "command": "sudo apt install package-name",
+              "description": "Install new software package"
+            },
+            {
+              "command": "sudo apt remove package-name",
+              "description": "Uninstall package (keeps config files)"
+            },
+            {
+              "command": "sudo apt purge package-name",
+              "description": "Completely remove package and configs"
+            },
+            {
+              "command": "apt search keyword",
+              "description": "Search for packages"
+            },
+            {
+              "command": "sudo apt autoremove",
+              "description": "Remove unused dependencies"
+            }
           ],
           "details": [
-            {"label": "update", "value": "Update package lists"},
-            {"label": "upgrade", "value": "Upgrade installed packages"},
-            {"label": "install", "value": "Install new package"},
-            {"label": "remove", "value": "Remove package"}
+            {"label": "update", "value": "Refresh package lists"},
+            {"label": "upgrade", "value": "Install available updates"},
+            {"label": "install", "value": "Add new package"},
+            {"label": "remove", "value": "Uninstall package"},
+            {"label": "purge", "value": "Remove including configs"},
+            {"label": "autoremove", "value": "Clean up unused packages"}
           ],
-          "notes": "Most apt commands require sudo privileges"
+          "notes": "Always run 'sudo apt update' before installing or upgrading packages"
         },
         {
           "id": "yum",
-          "name": "yum",
-          "description": "Package manager for RHEL/CentOS",
+          "name": "yum (RHEL/CentOS)",
+          "description": "Package manager for RedHat-based systems",
           "content": {
-            "Command": "yum [command] [package]",
-            "Purpose": "Manage software packages",
-            "Distros": "RHEL, CentOS, Fedora (older)"
+            "Distros": "RHEL, CentOS, Fedora (older versions)",
+            "Purpose": "Manage RPM packages"
           },
           "examples": [
-            "sudo yum update",
-            "sudo yum install package-name",
-            "sudo yum remove package-name",
-            "yum search keyword"
+            {
+              "command": "sudo yum update",
+              "description": "Update all packages"
+            },
+            {
+              "command": "sudo yum install package-name",
+              "description": "Install new package"
+            },
+            {
+              "command": "sudo yum remove package-name",
+              "description": "Uninstall package"
+            },
+            {
+              "command": "yum search keyword",
+              "description": "Search for packages"
+            },
+            {
+              "command": "yum list installed",
+              "description": "List all installed packages"
+            }
           ],
           "details": [
             {"label": "update", "value": "Update all packages"},
-            {"label": "install", "value": "Install package"},
-            {"label": "remove", "value": "Remove package"},
-            {"label": "search", "value": "Search for package"}
-          ]
+            {"label": "install", "value": "Add package"},
+            {"label": "remove", "value": "Uninstall package"},
+            {"label": "search", "value": "Find packages"}
+          ],
+          "notes": "Newer Fedora and RHEL 8+ use 'dnf' instead (compatible commands)"
+        },
+        {
+          "id": "snap",
+          "name": "snap",
+          "description": "Universal package manager (cross-distro)",
+          "content": {
+            "Distros": "Ubuntu, many others",
+            "Purpose": "Install containerized apps"
+          },
+          "examples": [
+            {
+              "command": "snap find keyword",
+              "description": "Search for snap packages"
+            },
+            {
+              "command": "sudo snap install package-name",
+              "description": "Install snap package"
+            },
+            {
+              "command": "sudo snap remove package-name",
+              "description": "Uninstall snap package"
+            },
+            {
+              "command": "snap list",
+              "description": "List installed snaps"
+            }
+          ],
+          "notes": "Self-contained packages - larger but work across different Linux distributions"
+        }
+      ]
+    },
+    {
+      "id": "system-info",
+      "name": "System Information",
+      "entries": [
+        {
+          "id": "uname",
+          "name": "uname",
+          "description": "System and kernel information",
+          "content": {
+            "Purpose": "Show system details"
+          },
+          "examples": [
+            {
+              "command": "uname -a",
+              "description": "Show all system information"
+            },
+            {
+              "command": "uname -r",
+              "description": "Show kernel version"
+            },
+            {
+              "command": "uname -m",
+              "description": "Show machine architecture (x86_64, arm64, etc.)"
+            }
+          ],
+          "details": [
+            {"label": "-a", "value": "All information"},
+            {"label": "-r", "value": "Kernel release"},
+            {"label": "-m", "value": "Machine hardware name"}
+          ],
+          "notes": "Useful for checking kernel version and architecture"
+        },
+        {
+          "id": "hostname",
+          "name": "hostname",
+          "description": "Show or set system hostname",
+          "content": {
+            "Purpose": "Display/change computer name"
+          },
+          "examples": [
+            {
+              "command": "hostname",
+              "description": "Show current hostname"
+            },
+            {
+              "command": "hostname -I",
+              "description": "Show all IP addresses"
+            },
+            {
+              "command": "sudo hostnamectl set-hostname newhostname",
+              "description": "Change hostname permanently"
+            }
+          ],
+          "notes": "Hostname identifies your computer on the network"
+        },
+        {
+          "id": "uptime",
+          "name": "uptime",
+          "description": "System uptime and load average",
+          "content": {
+            "Purpose": "How long system has been running"
+          },
+          "examples": [
+            {
+              "command": "uptime",
+              "description": "Show uptime and load average"
+            },
+            {
+              "command": "uptime -p",
+              "description": "Show uptime in pretty format"
+            }
+          ],
+          "notes": "Load average shows system load over 1, 5, and 15 minutes"
+        },
+        {
+          "id": "whoami",
+          "name": "whoami",
+          "description": "Show current username",
+          "content": {
+            "Purpose": "Display logged-in user"
+          },
+          "examples": [
+            {
+              "command": "whoami",
+              "description": "Show your username"
+            }
+          ],
+          "notes": "Simple command to check which user you're logged in as"
+        },
+        {
+          "id": "w",
+          "name": "w",
+          "description": "Who is logged in and what they're doing",
+          "content": {
+            "Purpose": "Show logged-in users and their activity"
+          },
+          "examples": [
+            {
+              "command": "w",
+              "description": "Show all logged-in users"
+            },
+            {
+              "command": "who",
+              "description": "Simpler list of logged-in users"
+            }
+          ],
+          "notes": "Useful on multi-user systems to see who's logged in"
+        }
+      ]
+    },
+    {
+      "id": "archiving",
+      "name": "Compression & Archives",
+      "entries": [
+        {
+          "id": "tar",
+          "name": "tar",
+          "description": "Archive files (tape archive)",
+          "content": {
+            "Purpose": "Create and extract archive files"
+          },
+          "examples": [
+            {
+              "command": "tar -czf archive.tar.gz folder/",
+              "description": "Create compressed archive (.tar.gz)"
+            },
+            {
+              "command": "tar -xzf archive.tar.gz",
+              "description": "Extract .tar.gz archive"
+            },
+            {
+              "command": "tar -tzf archive.tar.gz",
+              "description": "List contents without extracting"
+            },
+            {
+              "command": "tar -xzf archive.tar.gz -C /destination/",
+              "description": "Extract to specific directory"
+            }
+          ],
+          "details": [
+            {"label": "-c", "value": "Create archive"},
+            {"label": "-x", "value": "Extract archive"},
+            {"label": "-z", "value": "Use gzip compression"},
+            {"label": "-f", "value": "File name"},
+            {"label": "-v", "value": "Verbose (show files)"},
+            {"label": "-C dir", "value": "Change to directory"}
+          ],
+          "notes": "Remember: 'czf' to create, 'xzf' to extract. Add 'v' for verbose output"
+        },
+        {
+          "id": "zip-unzip",
+          "name": "zip / unzip",
+          "description": "Create and extract .zip files",
+          "content": {
+            "Purpose": "Work with ZIP archives"
+          },
+          "examples": [
+            {
+              "command": "zip archive.zip file1 file2",
+              "description": "Create zip archive"
+            },
+            {
+              "command": "zip -r archive.zip folder/",
+              "description": "Zip entire directory recursively"
+            },
+            {
+              "command": "unzip archive.zip",
+              "description": "Extract zip archive"
+            },
+            {
+              "command": "unzip -l archive.zip",
+              "description": "List contents without extracting"
+            }
+          ],
+          "details": [
+            {"label": "-r", "value": "Recursive (for directories)"},
+            {"label": "-l", "value": "List contents"},
+            {"label": "-d dir", "value": "Extract to directory"}
+          ],
+          "notes": "ZIP format is cross-platform - works on Windows, Mac, Linux"
+        },
+        {
+          "id": "gzip",
+          "name": "gzip / gunzip",
+          "description": "Compress individual files",
+          "content": {
+            "Purpose": "Compress single files (replaces original)"
+          },
+          "examples": [
+            {
+              "command": "gzip file.txt",
+              "description": "Compress file to file.txt.gz (removes original)"
+            },
+            {
+              "command": "gunzip file.txt.gz",
+              "description": "Decompress file"
+            },
+            {
+              "command": "gzip -k file.txt",
+              "description": "Compress but keep original file"
+            }
+          ],
+          "details": [
+            {"label": "-k", "value": "Keep original file"},
+            {"label": "-d", "value": "Decompress (same as gunzip)"}
+          ],
+          "notes": "gzip only compresses single files - use tar for directories"
+        }
+      ]
+    },
+    {
+      "id": "networking-basics",
+      "name": "Basic Networking",
+      "entries": [
+        {
+          "id": "ip-addr",
+          "name": "ip addr",
+          "description": "Show network interfaces and IP addresses",
+          "content": {
+            "Purpose": "Display network configuration"
+          },
+          "examples": [
+            {
+              "command": "ip addr",
+              "description": "Show all network interfaces and IPs"
+            },
+            {
+              "command": "ip addr show eth0",
+              "description": "Show specific interface"
+            },
+            {
+              "command": "ip link show",
+              "description": "Show interface status (up/down)"
+            }
+          ],
+          "notes": "Modern replacement for 'ifconfig' command"
+        },
+        {
+          "id": "ping",
+          "name": "ping",
+          "description": "Test network connectivity",
+          "content": {
+            "Purpose": "Check if host is reachable"
+          },
+          "examples": [
+            {
+              "command": "ping google.com",
+              "description": "Test internet connectivity"
+            },
+            {
+              "command": "ping -c 4 192.168.1.1",
+              "description": "Send only 4 packets"
+            }
+          ],
+          "details": [
+            {"label": "-c N", "value": "Send N packets then stop"}
+          ],
+          "notes": "Press Ctrl+C to stop. Look for '0% packet loss' for good connection"
+        },
+        {
+          "id": "wget-curl-simple",
+          "name": "wget / curl",
+          "description": "Download files from internet",
+          "content": {
+            "Purpose": "Fetch files via HTTP/HTTPS"
+          },
+          "examples": [
+            {
+              "command": "wget https://example.com/file.zip",
+              "description": "Download file"
+            },
+            {
+              "command": "curl -O https://example.com/file.zip",
+              "description": "Download file with curl"
+            }
+          ],
+          "notes": "wget is simpler for downloads, curl is better for APIs"
         }
       ]
     }
