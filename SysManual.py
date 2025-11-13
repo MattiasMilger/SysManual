@@ -65,7 +65,19 @@ class SysManualFramework:
                                         "content": {"type": "object"},
                                         "examples": {
                                             "type": "array",
-                                            "items": {"type": "string"}
+                                            "items": {
+                                                "oneOf": [
+                                                    {"type": "string"},
+                                                    {
+                                                        "type": "object",
+                                                        "required": ["command"],
+                                                        "properties": {
+                                                            "command": {"type": "string"},
+                                                            "description": {"type": "string"}
+                                                        }
+                                                    }
+                                                ]
+                                            }
                                         },
                                         "details": {
                                             "type": "array",
@@ -300,12 +312,12 @@ class SysManualFramework:
     
     def create_entry_widget(self, entry: dict):
         """Create a widget for an entry"""
-        frame = ttk.LabelFrame(self.entries_container, text=entry['name'], padding=10)
-        frame.pack(fill=tk.X, pady=5, padx=5)
+        frame = ttk.LabelFrame(self.entries_container, text=entry['name'], padding=15)
+        frame.pack(fill=tk.X, pady=8, padx=5)
         
-        # Description
-        desc_label = ttk.Label(frame, text=entry['description'], wraplength=700)
-        desc_label.pack(anchor=tk.W, pady=(0, 5))
+        # Description - larger, more visible
+        desc_label = ttk.Label(frame, text=entry['description'], wraplength=700, font=('Arial', 10))
+        desc_label.pack(anchor=tk.W, pady=(0, 8))
         
         # Content (flexible key-value pairs)
         if entry.get('content'):
@@ -322,19 +334,36 @@ class SysManualFramework:
                 
                 ttk.Button(content_frame, text="Copy", width=6, command=lambda v=value: self.copy_to_clipboard(str(v))).pack(side=tk.LEFT)
         
-        # Examples
+        # Examples - support both old (string) and new (object) format
         if entry.get('examples'):
             ttk.Label(frame, text="Examples:", font=('Arial', 9, 'bold')).pack(anchor=tk.W, pady=(5, 2))
             for example in entry['examples']:
                 ex_frame = ttk.Frame(frame)
                 ex_frame.pack(fill=tk.X, pady=2)
                 
+                # Check if example is a string (old format) or dict (new format)
+                if isinstance(example, str):
+                    # Old format: just the command
+                    command = example
+                    description = None
+                else:
+                    # New format: object with command and description
+                    command = example.get('command', '')
+                    description = example.get('description', None)
+                
+                # Command text box
                 ex_text = tk.Text(ex_frame, height=1, wrap=tk.NONE, font=('Courier', 8), bg='#f9f9f9')
                 ex_text.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(10, 5))
-                ex_text.insert('1.0', example)
+                ex_text.insert('1.0', command)
                 ex_text.config(state=tk.DISABLED)
                 
-                ttk.Button(ex_frame, text="Copy", width=6, command=lambda e=example: self.copy_to_clipboard(e)).pack(side=tk.LEFT)
+                ttk.Button(ex_frame, text="Copy", width=6, command=lambda c=command: self.copy_to_clipboard(c)).pack(side=tk.LEFT)
+                
+                # Description (if new format)
+                if description:
+                    desc_frame = ttk.Frame(frame)
+                    desc_frame.pack(fill=tk.X, pady=(0, 2))
+                    ttk.Label(desc_frame, text=f"  → {description}", font=('Arial', 8), foreground='#555', wraplength=680).pack(anchor=tk.W, padx=(10, 0))
         
         # Details (expandable list)
         if entry.get('details'):
@@ -426,8 +455,14 @@ class SysManualEditor:
                                 "Protocol": "TCP"
                             },
                             "examples": [
-                                "example-command -h",
-                                "example-command --verbose"
+                                {
+                                    "command": "example-command -h",
+                                    "description": "Show help message"
+                                },
+                                {
+                                    "command": "example-command --verbose",
+                                    "description": "Run with verbose output"
+                                }
                             ],
                             "details": [
                                 {
