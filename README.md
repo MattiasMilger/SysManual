@@ -1,10 +1,6 @@
-This application is using standard Python libraries and jsonschema.
-
-----------------------------
-
 Requirements:
 
-Python 3.13 Installed
+Python 3.13 or later Installed
 
 jsonschema installed
 
@@ -16,8 +12,8 @@ First, make sure libraries are installed by running pip install jsonschema in co
 
 Save the files provided.
 
-Root folder: SysManual.py, sysmanuals (subfolder)
+Root folder: SysManual.py
 
-sysmanuals: linux_sysmanual.json, network_sysmanual.json
+sysmanuals (sub folder): linux_sysmanual.json, network_sysmanual.json
     
 Run SysManual.py
