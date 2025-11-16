@@ -198,7 +198,7 @@ class SysManualFramework:
         search_entry.pack(side=tk.LEFT, padx=5)
         
         # Editor button
-        ttk.Button(toolbar, text="SysManual Editor", command=self.open_editor).pack(side=tk.RIGHT, padx=5)
+        ttk.Button(toolbar, text="GUI Editor", command=self.open_gui_editor).pack(side=tk.RIGHT, padx=5)
         
         # Main content area
         content = ttk.Frame(self.root)
@@ -401,93 +401,130 @@ class SysManualFramework:
         self.root.clipboard_append(text)
         messagebox.showinfo("Copied", "Copied to clipboard!")
     
-    def open_editor(self):
-        """Open sysmanual editor"""
-        editor = SysManualEditor(self.root, self)
+    def open_gui_editor(self):
+        """Open GUI sysmanual editor"""
+        editor = SysManualGUIEditor(self.root, self)
 
-class SysManualEditor:
+class SysManualGUIEditor:
     def __init__(self, parent, framework):
         self.framework = framework
         self.window = tk.Toplevel(parent)
-        self.window.title("SysManual Editor")
-        self.window.geometry("800x600")
+        self.window.title("SysManual GUI Editor")
+        self.window.geometry("1400x900")
+        
+        self.current_sysmanual = None
+        self.editing_item = None
+        
+        # Main container
+        main_container = ttk.Frame(self.window)
+        main_container.pack(fill=tk.BOTH, expand=True)
         
         # Toolbar
+        self.setup_toolbar()
+        
+        # Paned window for tree and editor
+        paned = ttk.PanedWindow(main_container, orient=tk.HORIZONTAL)
+        paned.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+        
+        # Left: Tree view
+        left_frame = ttk.Frame(paned)
+        paned.add(left_frame, weight=1)
+        self.setup_tree(left_frame)
+        
+        # Right: Edit panel
+        right_frame = ttk.Frame(paned)
+        paned.add(right_frame, weight=2)
+        self.setup_edit_panel(right_frame)
+        
+        # Load current sysmanual if available
+        if framework.current_sysmanual:
+            self.load_sysmanual(framework.current_sysmanual)
+    
+    def setup_toolbar(self):
         toolbar = ttk.Frame(self.window)
         toolbar.pack(fill=tk.X, padx=5, pady=5)
         
-        ttk.Button(toolbar, text="New SysManual", command=self.new_sysmanual).pack(side=tk.LEFT, padx=5)
-        ttk.Button(toolbar, text="Open File", command=self.open_file).pack(side=tk.LEFT, padx=5)
-        ttk.Button(toolbar, text="Save", command=self.save_sysmanual).pack(side=tk.LEFT, padx=5)
-        ttk.Button(toolbar, text="Validate", command=self.validate).pack(side=tk.LEFT, padx=5)
+        ttk.Button(toolbar, text="New SysManual", command=self.new_sysmanual).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar, text="Open File", command=self.open_file).pack(side=tk.LEFT, padx=2)
+        ttk.Button(toolbar, text="Save", command=self.save_sysmanual).pack(side=tk.LEFT, padx=2)
         
-        # JSON editor
-        ttk.Label(self.window, text="Edit SysManual JSON:", font=('Arial', 10, 'bold')).pack(anchor=tk.W, padx=5)
+        ttk.Separator(toolbar, orient=tk.VERTICAL).pack(side=tk.LEFT, padx=10, fill=tk.Y)
         
-        self.editor = scrolledtext.ScrolledText(self.window, wrap=tk.WORD, font=('Courier', 10))
-        self.editor.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
-        
-        # Load template
-        self.load_template()
+        ttk.Label(toolbar, text="Load:").pack(side=tk.LEFT, padx=(5, 2))
+        self.load_combo = ttk.Combobox(toolbar, values=list(self.framework.sysmanuals.keys()), 
+                                       state="readonly", width=20)
+        self.load_combo.pack(side=tk.LEFT, padx=2)
+        self.load_combo.bind("<<ComboboxSelected>>", lambda e: self.load_sysmanual(self.load_combo.get()))
     
-    def load_template(self):
-        """Load a template sysmanual"""
-        template = {
-            "id": "my-sysmanual",
-            "name": "My SysManual",
-            "description": "Description of my sysmanual",
-            "theme": {
-                "primary": "#4CAF50",
-                "accent": "#2196F3"
-            },
-            "categories": [
-                {
-                    "id": "category-1",
-                    "name": "Category 1",
-                    "entries": [
-                        {
-                            "id": "entry-1",
-                            "name": "example-entry",
-                            "description": "This is an example entry",
-                            "content": {
-                                "Command": "example-command [options]",
-                                "Port": "8080",
-                                "Protocol": "TCP"
-                            },
-                            "examples": [
-                                {
-                                    "command": "example-command -h",
-                                    "description": "Show help message"
-                                },
-                                {
-                                    "command": "example-command --verbose",
-                                    "description": "Run with verbose output"
-                                }
-                            ],
-                            "details": [
-                                {
-                                    "label": "-h, --help",
-                                    "value": "Show help message"
-                                }
-                            ],
-                            "notes": "Additional notes about this entry"
-                        }
-                    ]
-                }
-            ]
-        }
-        self.editor.delete('1.0', tk.END)
-        self.editor.insert('1.0', json.dumps(template, indent=2))
+    def setup_tree(self, parent):
+        tree_frame = ttk.Frame(parent)
+        tree_frame.pack(fill=tk.BOTH, expand=True)
+        
+        ttk.Label(tree_frame, text="Structure", font=('Arial', 11, 'bold')).pack(anchor=tk.W, pady=5)
+        
+        # Tree with scrollbar
+        tree_scroll = ttk.Scrollbar(tree_frame)
+        tree_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set)
+        self.tree.pack(fill=tk.BOTH, expand=True)
+        tree_scroll.config(command=self.tree.yview)
+        
+        self.tree.bind('<<TreeviewSelect>>', self.on_tree_select)
+        self.tree.bind('<Button-3>', self.show_context_menu)  # Right-click
+        
+        # Context menu
+        self.context_menu = tk.Menu(self.tree, tearoff=0)
+        self.context_menu.add_command(label="Add Category", command=self.add_category)
+        self.context_menu.add_command(label="Add Entry", command=self.add_entry)
+        self.context_menu.add_separator()
+        self.context_menu.add_command(label="Delete", command=self.delete_item)
+    
+    def setup_edit_panel(self, parent):
+        # Scrollable edit panel
+        canvas = tk.Canvas(parent)
+        scrollbar = ttk.Scrollbar(parent, orient="vertical", command=canvas.yview)
+        self.edit_frame = ttk.Frame(canvas)
+        
+        self.edit_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=self.edit_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # Bind mousewheel
+        canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
+        
+        # Initial message
+        ttk.Label(self.edit_frame, text="Select an item to edit", 
+                 font=('Arial', 12)).pack(pady=20)
     
     def new_sysmanual(self):
-        """Create a new sysmanual"""
-        if messagebox.askyesno("New SysManual", "This will clear the current editor. Continue?"):
-            self.load_template()
+        """Create new sysmanual"""
+        if self.current_sysmanual and messagebox.askyesno("New SysManual", 
+            "Create new sysmanual? Unsaved changes will be lost."):
+            self.current_sysmanual = None
+            self.tree.delete(*self.tree.get_children())
+            self.clear_edit_panel()
+        
+        # Create template
+        template = {
+            "id": "new-sysmanual",
+            "name": "New SysManual",
+            "description": "Description",
+            "theme": {"primary": "#4CAF50", "accent": "#2196F3"},
+            "categories": []
+        }
+        self.current_sysmanual = template
+        self.populate_tree()
+        self.tree.selection_set(self.tree.get_children()[0])
+        self.on_tree_select(None)
     
     def open_file(self):
-        """Open a sysmanual file in the editor"""
+        """Open file to edit"""
         filepath = filedialog.askopenfilename(
-            title="Open SysManual JSON File",
+            title="Open SysManual JSON",
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
             initialdir=Path("sysmanuals") if Path("sysmanuals").exists() else Path.cwd()
         )
@@ -496,49 +533,451 @@ class SysManualEditor:
             try:
                 with open(filepath, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-                self.editor.delete('1.0', tk.END)
-                self.editor.insert('1.0', json.dumps(data, indent=2))
+                if self.framework.validate_sysmanual(data):
+                    self.current_sysmanual = data
+                    self.populate_tree()
+                    messagebox.showinfo("Success", "Loaded successfully!")
             except Exception as e:
-                messagebox.showerror("Error", f"Failed to open file:\n{str(e)}")
+                messagebox.showerror("Error", f"Failed to open:\n{str(e)}")
     
-    def validate(self):
-        """Validate the current JSON"""
-        try:
-            data = json.loads(self.editor.get('1.0', tk.END))
-            if self.framework.validate_sysmanual(data):
-                messagebox.showinfo("Valid", "SysManual JSON is valid!")
-        except json.JSONDecodeError as e:
-            messagebox.showerror("Invalid JSON", f"JSON parsing error:\n{str(e)}")
+    def load_sysmanual(self, sysmanual_id):
+        """Load existing sysmanual for editing"""
+        if sysmanual_id in self.framework.sysmanuals:
+            # Create a deep copy to avoid modifying the original
+            import copy
+            self.current_sysmanual = copy.deepcopy(self.framework.sysmanuals[sysmanual_id])
+            self.populate_tree()
     
-    def save_sysmanual(self):
-        """Save the sysmanual"""
-        try:
-            data = json.loads(self.editor.get('1.0', tk.END))
-            if not self.framework.validate_sysmanual(data):
+    def populate_tree(self):
+        """Populate tree with current sysmanual"""
+        self.tree.delete(*self.tree.get_children())
+        
+        if not self.current_sysmanual:
+            return
+        
+        # Root: SysManual
+        root = self.tree.insert('', 'end', text=f"📘 {self.current_sysmanual['name']}", 
+                               values=('sysmanual',), open=True)
+        
+        # Categories
+        for cat_idx, category in enumerate(self.current_sysmanual.get('categories', [])):
+            cat_node = self.tree.insert(root, 'end', text=f"📁 {category['name']}", 
+                                       values=('category', cat_idx), open=True)
+            
+            # Entries
+            for entry_idx, entry in enumerate(category.get('entries', [])):
+                self.tree.insert(cat_node, 'end', text=f"📄 {entry['name']}", 
+                               values=('entry', cat_idx, entry_idx))
+    
+    def on_tree_select(self, event):
+        """Handle tree selection"""
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        item = selection[0]
+        values = self.tree.item(item, 'values')
+        
+        if not values:
+            return
+        
+        item_type = values[0]
+        
+        if item_type == 'sysmanual':
+            self.show_sysmanual_editor()
+        elif item_type == 'category':
+            cat_idx = int(values[1])
+            self.show_category_editor(cat_idx)
+        elif item_type == 'entry':
+            cat_idx = int(values[1])
+            entry_idx = int(values[2])
+            self.show_entry_editor(cat_idx, entry_idx)
+    
+    def clear_edit_panel(self):
+        """Clear the edit panel"""
+        for widget in self.edit_frame.winfo_children():
+            widget.destroy()
+    
+    def show_sysmanual_editor(self):
+        """Show editor for sysmanual metadata"""
+        self.clear_edit_panel()
+        
+        ttk.Label(self.edit_frame, text="SysManual Settings", 
+                 font=('Arial', 14, 'bold')).pack(anchor=tk.W, pady=(10, 20), padx=10)
+        
+        # ID
+        self.create_field("ID:", self.current_sysmanual, 'id')
+        
+        # Name
+        self.create_field("Name:", self.current_sysmanual, 'name')
+        
+        # Description
+        self.create_text_field("Description:", self.current_sysmanual, 'description', height=3)
+        
+        # Theme
+        theme_frame = ttk.LabelFrame(self.edit_frame, text="Theme", padding=10)
+        theme_frame.pack(fill=tk.X, padx=10, pady=10)
+        
+        if 'theme' not in self.current_sysmanual:
+            self.current_sysmanual['theme'] = {"primary": "#4CAF50", "accent": "#2196F3"}
+        
+        self.create_field("Primary Color:", self.current_sysmanual['theme'], 'primary', parent=theme_frame)
+        self.create_field("Accent Color:", self.current_sysmanual['theme'], 'accent', parent=theme_frame)
+    
+    def show_category_editor(self, cat_idx):
+        """Show editor for category"""
+        self.clear_edit_panel()
+        
+        category = self.current_sysmanual['categories'][cat_idx]
+        
+        ttk.Label(self.edit_frame, text="Category Settings", 
+                 font=('Arial', 14, 'bold')).pack(anchor=tk.W, pady=(10, 20), padx=10)
+        
+        self.create_field("ID:", category, 'id')
+        self.create_field("Name:", category, 'name')
+        
+        # Add entry button
+        ttk.Button(self.edit_frame, text="+ Add Entry", 
+                  command=lambda: self.add_entry(cat_idx)).pack(anchor=tk.W, padx=10, pady=10)
+    
+    def show_entry_editor(self, cat_idx, entry_idx):
+        """Show editor for entry"""
+        self.clear_edit_panel()
+        
+        category = self.current_sysmanual['categories'][cat_idx]
+        entry = category['entries'][entry_idx]
+        
+        ttk.Label(self.edit_frame, text="Entry Editor", 
+                 font=('Arial', 14, 'bold')).pack(anchor=tk.W, pady=(10, 20), padx=10)
+        
+        # Basic fields
+        self.create_field("ID:", entry, 'id')
+        self.create_field("Name:", entry, 'name')
+        self.create_text_field("Description:", entry, 'description', height=3)
+        
+        # Content section (key-value pairs)
+        content_frame = ttk.LabelFrame(self.edit_frame, text="Content", padding=10)
+        content_frame.pack(fill=tk.BOTH, padx=10, pady=10)
+        
+        if 'content' not in entry:
+            entry['content'] = {}
+        
+        # Display existing content
+        for key in list(entry['content'].keys()):
+            self.create_content_row(content_frame, entry, key)
+        
+        # Add content button
+        ttk.Button(content_frame, text="+ Add Content Field", 
+                  command=lambda: self.add_content_field(content_frame, entry)).pack(anchor=tk.W, pady=5)
+        
+        # Examples section
+        examples_frame = ttk.LabelFrame(self.edit_frame, text="Examples", padding=10)
+        examples_frame.pack(fill=tk.BOTH, padx=10, pady=10)
+        
+        if 'examples' not in entry:
+            entry['examples'] = []
+        
+        for idx, example in enumerate(entry['examples']):
+            self.create_example_row(examples_frame, entry, idx)
+        
+        ttk.Button(examples_frame, text="+ Add Example", 
+                  command=lambda: self.add_example(examples_frame, entry)).pack(anchor=tk.W, pady=5)
+        
+        # Details section
+        details_frame = ttk.LabelFrame(self.edit_frame, text="Details", padding=10)
+        details_frame.pack(fill=tk.BOTH, padx=10, pady=10)
+        
+        if 'details' not in entry:
+            entry['details'] = []
+        
+        for idx, detail in enumerate(entry['details']):
+            self.create_detail_row(details_frame, entry, idx)
+        
+        ttk.Button(details_frame, text="+ Add Detail", 
+                  command=lambda: self.add_detail(details_frame, entry)).pack(anchor=tk.W, pady=5)
+        
+        # Notes
+        self.create_text_field("Notes:", entry, 'notes', height=3)
+    
+    def create_field(self, label, data_dict, key, parent=None):
+        """Create a simple text field"""
+        if parent is None:
+            parent = self.edit_frame
+        
+        frame = ttk.Frame(parent)
+        frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        ttk.Label(frame, text=label, width=15).pack(side=tk.LEFT)
+        
+        var = tk.StringVar(value=data_dict.get(key, ''))
+        entry = ttk.Entry(frame, textvariable=var)
+        entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        
+        # Update data on change
+        var.trace('w', lambda *args: data_dict.update({key: var.get()}))
+    
+    def create_text_field(self, label, data_dict, key, height=5, parent=None):
+        """Create a text area field"""
+        if parent is None:
+            parent = self.edit_frame
+        
+        frame = ttk.LabelFrame(parent, text=label, padding=5)
+        frame.pack(fill=tk.X, padx=10, pady=5)
+        
+        text = tk.Text(frame, height=height, wrap=tk.WORD)
+        text.pack(fill=tk.BOTH, expand=True)
+        text.insert('1.0', data_dict.get(key, ''))
+        
+        # Update data on change
+        def update_text(*args):
+            data_dict[key] = text.get('1.0', 'end-1c')
+        
+        text.bind('<KeyRelease>', update_text)
+    
+    def create_content_row(self, parent, entry, key):
+        """Create a row for content key-value pair"""
+        frame = ttk.Frame(parent)
+        frame.pack(fill=tk.X, pady=2)
+        
+        key_var = tk.StringVar(value=key)
+        value_var = tk.StringVar(value=entry['content'][key])
+        
+        ttk.Label(frame, text="Key:").pack(side=tk.LEFT)
+        key_entry = ttk.Entry(frame, textvariable=key_var, width=15)
+        key_entry.pack(side=tk.LEFT, padx=5)
+        
+        ttk.Label(frame, text="Value:").pack(side=tk.LEFT)
+        value_entry = ttk.Entry(frame, textvariable=value_var)
+        value_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        
+        # Update on change
+        def update_content(*args):
+            new_key = key_var.get()
+            if new_key != key and key in entry['content']:
+                del entry['content'][key]
+            entry['content'][new_key] = value_var.get()
+        
+        key_var.trace('w', update_content)
+        value_var.trace('w', update_content)
+        
+        ttk.Button(frame, text="×", width=3, 
+                  command=lambda: self.remove_content(parent, entry, key, frame)).pack(side=tk.LEFT)
+    
+    def add_content_field(self, parent, entry):
+        """Add new content field"""
+        key = f"field_{len(entry['content']) + 1}"
+        entry['content'][key] = ""
+        self.create_content_row(parent, entry, key)
+    
+    def remove_content(self, parent, entry, key, frame):
+        """Remove content field"""
+        if key in entry['content']:
+            del entry['content'][key]
+        frame.destroy()
+    
+    def create_example_row(self, parent, entry, idx):
+        """Create a row for an example"""
+        frame = ttk.LabelFrame(parent, text=f"Example {idx + 1}", padding=5)
+        frame.pack(fill=tk.X, pady=5)
+        
+        example = entry['examples'][idx]
+        
+        # Handle both string and dict formats
+        if isinstance(example, str):
+            example = {"command": example, "description": ""}
+            entry['examples'][idx] = example
+        
+        # Command
+        cmd_frame = ttk.Frame(frame)
+        cmd_frame.pack(fill=tk.X, pady=2)
+        ttk.Label(cmd_frame, text="Command:").pack(side=tk.LEFT)
+        cmd_var = tk.StringVar(value=example.get('command', ''))
+        cmd_entry = ttk.Entry(cmd_frame, textvariable=cmd_var)
+        cmd_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        cmd_var.trace('w', lambda *args: example.update({'command': cmd_var.get()}))
+        
+        # Description
+        desc_frame = ttk.Frame(frame)
+        desc_frame.pack(fill=tk.X, pady=2)
+        ttk.Label(desc_frame, text="Description:").pack(side=tk.LEFT)
+        desc_var = tk.StringVar(value=example.get('description', ''))
+        desc_entry = ttk.Entry(desc_frame, textvariable=desc_var)
+        desc_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        desc_var.trace('w', lambda *args: example.update({'description': desc_var.get()}))
+        
+        # Remove button
+        ttk.Button(frame, text="Remove Example", 
+                  command=lambda: self.remove_example(parent, entry, idx, frame)).pack(anchor=tk.E, pady=2)
+    
+    def add_example(self, parent, entry):
+        """Add new example"""
+        entry['examples'].append({"command": "", "description": ""})
+        self.create_example_row(parent, entry, len(entry['examples']) - 1)
+    
+    def remove_example(self, parent, entry, idx, frame):
+        """Remove example"""
+        if idx < len(entry['examples']):
+            entry['examples'].pop(idx)
+        frame.destroy()
+        # Refresh to update indices
+        for widget in parent.winfo_children():
+            if isinstance(widget, ttk.LabelFrame):
+                widget.destroy()
+        for i, example in enumerate(entry['examples']):
+            self.create_example_row(parent, entry, i)
+    
+    def create_detail_row(self, parent, entry, idx):
+        """Create a row for a detail"""
+        frame = ttk.Frame(parent)
+        frame.pack(fill=tk.X, pady=2)
+        
+        detail = entry['details'][idx]
+        
+        ttk.Label(frame, text="Label:").pack(side=tk.LEFT)
+        label_var = tk.StringVar(value=detail.get('label', ''))
+        label_entry = ttk.Entry(frame, textvariable=label_var, width=20)
+        label_entry.pack(side=tk.LEFT, padx=5)
+        label_var.trace('w', lambda *args: detail.update({'label': label_var.get()}))
+        
+        ttk.Label(frame, text="Value:").pack(side=tk.LEFT)
+        value_var = tk.StringVar(value=detail.get('value', ''))
+        value_entry = ttk.Entry(frame, textvariable=value_var)
+        value_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+        value_var.trace('w', lambda *args: detail.update({'value': value_var.get()}))
+        
+        ttk.Button(frame, text="×", width=3,
+                  command=lambda: self.remove_detail(parent, entry, idx, frame)).pack(side=tk.LEFT)
+    
+    def add_detail(self, parent, entry):
+        """Add new detail"""
+        entry['details'].append({"label": "", "value": ""})
+        self.create_detail_row(parent, entry, len(entry['details']) - 1)
+    
+    def remove_detail(self, parent, entry, idx, frame):
+        """Remove detail"""
+        if idx < len(entry['details']):
+            entry['details'].pop(idx)
+        frame.destroy()
+    
+    def show_context_menu(self, event):
+        """Show context menu on right-click"""
+        item = self.tree.identify_row(event.y)
+        if item:
+            self.tree.selection_set(item)
+            self.context_menu.post(event.x_root, event.y_root)
+    
+    def add_category(self):
+        """Add new category"""
+        if not self.current_sysmanual:
+            messagebox.showwarning("No SysManual", "Please create or load a sysmanual first.")
+            return
+        
+        category = {
+            "id": f"category_{len(self.current_sysmanual['categories']) + 1}",
+            "name": "New Category",
+            "entries": []
+        }
+        self.current_sysmanual['categories'].append(category)
+        self.populate_tree()
+        messagebox.showinfo("Success", "Category added!")
+    
+    def add_entry(self, cat_idx=None):
+        """Add new entry"""
+        if not self.current_sysmanual:
+            messagebox.showwarning("No SysManual", "Please create or load a sysmanual first.")
+            return
+        
+        # If no category specified, use selected one
+        if cat_idx is None:
+            selection = self.tree.selection()
+            if not selection:
+                messagebox.showwarning("No Selection", "Please select a category first.")
                 return
             
-            # Ask where to save
-            filepath = filedialog.asksaveasfilename(
-                title="Save SysManual",
-                defaultextension=".json",
-                filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
-                initialdir=Path("sysmanuals") if Path("sysmanuals").exists() else Path.cwd(),
-                initialfile=f"{data['id']}_sysmanual.json"
-            )
+            values = self.tree.item(selection[0], 'values')
+            if not values or values[0] not in ['category', 'entry']:
+                messagebox.showwarning("Invalid Selection", "Please select a category.")
+                return
             
-            if filepath:
+            cat_idx = int(values[1])
+        
+        category = self.current_sysmanual['categories'][cat_idx]
+        entry = {
+            "id": f"entry_{len(category['entries']) + 1}",
+            "name": "New Entry",
+            "description": "Description",
+            "content": {},
+            "examples": [],
+            "details": [],
+            "notes": ""
+        }
+        category['entries'].append(entry)
+        self.populate_tree()
+        messagebox.showinfo("Success", "Entry added!")
+    
+    def delete_item(self):
+        """Delete selected item"""
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        values = self.tree.item(selection[0], 'values')
+        if not values:
+            return
+        
+        item_type = values[0]
+        
+        if item_type == 'sysmanual':
+            messagebox.showwarning("Cannot Delete", "Cannot delete the root sysmanual.")
+            return
+        
+        if not messagebox.askyesno("Confirm Delete", f"Delete this {item_type}?"):
+            return
+        
+        if item_type == 'category':
+            cat_idx = int(values[1])
+            self.current_sysmanual['categories'].pop(cat_idx)
+        elif item_type == 'entry':
+            cat_idx = int(values[1])
+            entry_idx = int(values[2])
+            self.current_sysmanual['categories'][cat_idx]['entries'].pop(entry_idx)
+        
+        self.populate_tree()
+        self.clear_edit_panel()
+        messagebox.showinfo("Success", f"{item_type.capitalize()} deleted!")
+    
+    def save_sysmanual(self):
+        """Save the current sysmanual"""
+        if not self.current_sysmanual:
+            messagebox.showwarning("No SysManual", "Nothing to save.")
+            return
+        
+        if not self.framework.validate_sysmanual(self.current_sysmanual):
+            return
+        
+        filepath = filedialog.asksaveasfilename(
+            title="Save SysManual",
+            defaultextension=".json",
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+            initialdir=Path("sysmanuals") if Path("sysmanuals").exists() else Path.cwd(),
+            initialfile=f"{self.current_sysmanual['id']}_sysmanual.json"
+        )
+        
+        if filepath:
+            try:
                 with open(filepath, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, indent=2)
+                    json.dump(self.current_sysmanual, f, indent=2)
                 
-                messagebox.showinfo("Saved", f"SysManual saved to {Path(filepath).name}")
+                messagebox.showinfo("Saved", f"Saved to {Path(filepath).name}")
                 
-                # Reload if saved in sysmanuals directory
+                # Reload in framework
                 if self.framework.load_sysmanual_file(filepath):
-                    self.framework.sysmanual_var.set(data['id'])
-                    self.framework.switch_sysmanual(data['id'])
-            
-        except Exception as e:
-            messagebox.showerror("Save Error", f"Failed to save:\n{str(e)}")
+                    self.framework.sysmanual_var.set(self.current_sysmanual['id'])
+                    self.framework.switch_sysmanual(self.current_sysmanual['id'])
+                    # Update combo box
+                    self.load_combo['values'] = list(self.framework.sysmanuals.keys())
+            except Exception as e:
+                messagebox.showerror("Save Error", f"Failed to save:\n{str(e)}")
 
 def main():
     root = tk.Tk()
