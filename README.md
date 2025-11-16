@@ -1,19 +1,25 @@
 Requirements:
 
-Python 3.13 or later Installed
+Python 3.13 or later
 
-jsonschema installed
+jsonschema library
+
+----------------------------
+
+Preparations:
+
+Make sure Python is installed
+
+Open command line > pip install jsonschema
+
+Save the files provided in the following structure
+
+Root folder: SysManual.py
+
+sysmanuals: linux_sysmanual.json, network_sysmanual.json
 
 ----------------------------
 
 How to Run the App:
 
-First, make sure libraries are installed by running pip install jsonschema in command line.
-
-Save the files provided.
-
-Root folder: SysManual.py
-
-sysmanuals (sub folder): linux_sysmanual.json, network_sysmanual.json
-    
 Run SysManual.py
