@@ -38,14 +38,33 @@
             {
               "command": "ls -R",
               "description": "List all subdirectories recursively"
+            },
+            {
+              "command": "ls --color=auto",
+              "description": "Color-coded output (default on most systems)"
             }
           ],
           "details": [
-            {"label": "-l", "value": "Long format (detailed info)"},
-            {"label": "-a", "value": "Show hidden files (starting with .)"},
-            {"label": "-h", "value": "Human-readable sizes"},
-            {"label": "-t", "value": "Sort by time"},
-            {"label": "-R", "value": "Recursive"}
+            {
+              "label": "-l",
+              "value": "Long format (detailed info)"
+            },
+            {
+              "label": "-a",
+              "value": "Show hidden files (starting with .)"
+            },
+            {
+              "label": "-h",
+              "value": "Human-readable sizes"
+            },
+            {
+              "label": "-t",
+              "value": "Sort by time"
+            },
+            {
+              "label": "-R",
+              "value": "Recursive"
+            }
           ],
           "notes": "Combine options: -lah shows detailed, human-readable list with hidden files"
         },
@@ -72,6 +91,10 @@
             {
               "command": "cd -",
               "description": "Go to previous directory"
+            },
+            {
+              "command": "pushd /tmp && popd",
+              "description": "Save/restore directory stack"
             }
           ],
           "notes": "~ represents home directory, . is current directory, .. is parent directory"
@@ -87,6 +110,10 @@
             {
               "command": "pwd",
               "description": "Display full path of current directory"
+            },
+            {
+              "command": "pwd -P",
+              "description": "Show physical path (resolve symlinks)"
             }
           ],
           "notes": "Useful when you're lost in the directory structure"
@@ -109,18 +136,38 @@
             },
             {
               "command": "cp -r folder/ /backup/",
-              "description": "Copy entire directory recursively"
+              "description": "Copy entire-recursively"
             },
             {
               "command": "cp -p file.txt backup.txt",
               "description": "Preserve file attributes (timestamps, permissions)"
+            },
+            {
+              "command": "cp -u *.log /backup/",
+              "description": "Copy only when newer"
             }
           ],
           "details": [
-            {"label": "-r", "value": "Recursive (for directories)"},
-            {"label": "-p", "value": "Preserve attributes"},
-            {"label": "-v", "value": "Verbose (show what's being copied)"},
-            {"label": "-i", "value": "Interactive (prompt before overwrite)"}
+            {
+              "label": "-r",
+              "value": "Recursive (for directories)"
+            },
+            {
+              "label": "-p",
+              "value": "Preserve attributes"
+            },
+            {
+              "label": "-v",
+              "value": "Verbose (show what's being copied)"
+            },
+            {
+              "label": "-i",
+              "value": "Interactive (prompt before overwrite)"
+            },
+            {
+              "label": "-u",
+              "value": "Update: copy only if source is newer"
+            }
           ],
           "notes": "Always use -r when copying directories, or you'll get an error"
         },
@@ -143,12 +190,25 @@
             {
               "command": "mv *.txt documents/",
               "description": "Move all .txt files to documents folder"
+            },
+            {
+              "command": "mv -i file.txt dest/",
+              "description": "Prompt before overwrite"
             }
           ],
           "details": [
-            {"label": "-i", "value": "Prompt before overwriting"},
-            {"label": "-v", "value": "Verbose output"},
-            {"label": "-n", "value": "Never overwrite existing files"}
+            {
+              "label": "-i",
+              "value": "Prompt before overwriting"
+            },
+            {
+              "label": "-v",
+              "value": "Verbose output"
+            },
+            {
+              "label": "-n",
+              "value": "Never overwrite existing files"
+            }
           ],
           "notes": "mv works across filesystems - cp then delete would be two operations"
         },
@@ -175,15 +235,35 @@
             {
               "command": "rm -rf directory/",
               "description": "Force delete without prompts (DANGEROUS!)"
+            },
+            {
+              "command": "rm -d empty_dir/",
+              "description": "Remove empty directory"
             }
           ],
           "details": [
-            {"label": "-r", "value": "Recursive (for directories)"},
-            {"label": "-f", "value": "Force (no prompts or warnings)"},
-            {"label": "-i", "value": "Interactive (confirm each deletion)"},
-            {"label": "-v", "value": "Verbose (show what's deleted)"}
+            {
+              "label": "-r",
+              "value": "Recursive (for directories)"
+            },
+            {
+              "label": "-f",
+              "value": "Force (no prompts or warnings)"
+            },
+            {
+              "label": "-i",
+              "value": "Interactive (confirm each deletion)"
+            },
+            {
+              "label": "-v",
+              "value": "Verbose (show what's deleted)"
+            },
+            {
+              "label": "-d",
+              "value": "Remove empty directories"
+            }
           ],
-          "notes": "⚠️ DANGER: No undo! Files are permanently deleted. Never run 'rm -rf /' as root!"
+          "notes": "DANGER: No undo! Files are permanently deleted. Never run 'rm -rf /' as root!"
         },
         {
           "id": "mkdir",
@@ -204,11 +284,25 @@
             {
               "command": "mkdir dir1 dir2 dir3",
               "description": "Create multiple directories at once"
+            },
+            {
+              "command": "mkdir -m 700 private/",
+              "description": "Create with specific permissions"
             }
           ],
           "details": [
-            {"label": "-p", "value": "Create parent directories if needed"},
-            {"label": "-v", "value": "Verbose (show what's created)"}
+            {
+              "label": "-p",
+              "value": "Create parent directories if needed"
+            },
+            {
+              "label": "-v",
+              "value": "Verbose (show what's created)"
+            },
+            {
+              "label": "-m MODE",
+              "value": "Set permissions on creation"
+            }
           ],
           "notes": "Use -p to avoid errors when parent directories don't exist"
         },
@@ -231,9 +325,46 @@
             {
               "command": "touch existing.txt",
               "description": "Update modification time of existing file"
+            },
+            {
+              "command": "touch -d '2025-01-01' file.txt",
+              "description": "Set specific timestamp"
             }
           ],
           "notes": "If file exists, touch only updates the timestamp without changing content"
+        },
+        {
+          "id": "ln",
+          "name": "ln",
+          "description": "Create hard or symbolic links",
+          "content": {
+            "Purpose": "Create file shortcuts"
+          },
+          "examples": [
+            {
+              "command": "ln -s /var/log/syslog log",
+              "description": "Create symbolic link"
+            },
+            {
+              "command": "ln file.txt hardlink.txt",
+              "description": "Create hard link (same inode)"
+            },
+            {
+              "command": "ln -sf /new/location/file.txt link",
+              "description": "Force update symlink"
+            }
+          ],
+          "details": [
+            {
+              "label": "-s",
+              "value": "Symbolic (soft) link"
+            },
+            {
+              "label": "-f",
+              "value": "Force creation/overwrite"
+            }
+          ],
+          "notes": "Symbolic links can point to non-existent files; hard links share inode"
         }
       ]
     },
@@ -260,6 +391,10 @@
             {
               "command": "cat file.txt | grep 'error'",
               "description": "Display file and search for text"
+            },
+            {
+              "command": "cat -n file.txt",
+              "description": "Show line numbers"
             }
           ],
           "notes": "Good for small files - for large files use 'less' or 'head/tail'"
@@ -279,14 +414,33 @@
             {
               "command": "less +F /var/log/syslog",
               "description": "Follow file (like tail -f)"
+            },
+            {
+              "command": "journalctl | less",
+              "description": "View systemd logs"
             }
           ],
           "details": [
-            {"label": "Space", "value": "Next page"},
-            {"label": "b", "value": "Previous page"},
-            {"label": "/pattern", "value": "Search forward"},
-            {"label": "q", "value": "Quit"},
-            {"label": "G", "value": "Go to end of file"}
+            {
+              "label": "Space",
+              "value": "Next page"
+            },
+            {
+              "label": "b",
+              "value": "Previous page"
+            },
+            {
+              "label": "/pattern",
+              "value": "Search forward"
+            },
+            {
+              "label": "q",
+              "value": "Quit"
+            },
+            {
+              "label": "G",
+              "value": "Go to end of file"
+            }
           ],
           "notes": "Better than 'more' - allows backward scrolling and searching"
         },
@@ -309,11 +463,21 @@
             {
               "command": "head -n 5 *.log",
               "description": "Show first 5 lines of all log files"
+            },
+            {
+              "command": "head -c 100 file.txt",
+              "description": "Show first 100 bytes"
             }
           ],
           "details": [
-            {"label": "-n N", "value": "Show first N lines"},
-            {"label": "-c N", "value": "Show first N bytes"}
+            {
+              "label": "-n N",
+              "value": "Show first N lines"
+            },
+            {
+              "label": "-c N",
+              "value": "Show first N bytes"
+            }
           ],
           "notes": "Useful for quickly checking file format or headers"
         },
@@ -340,12 +504,25 @@
             {
               "command": "tail -f /var/log/apache2/access.log",
               "description": "Monitor web server access in real-time"
+            },
+            {
+              "command": "tail -n +100 file.txt",
+              "description": "Show from line 100 to end"
             }
           ],
           "details": [
-            {"label": "-n N", "value": "Show last N lines"},
-            {"label": "-f", "value": "Follow file (show new lines as added)"},
-            {"label": "-F", "value": "Follow and retry (handles log rotation)"}
+            {
+              "label": "-n N",
+              "value": "Show last N lines"
+            },
+            {
+              "label": "-f",
+              "value": "Follow file (show new lines as added)"
+            },
+            {
+              "label": "-F",
+              "value": "Follow and retry (handles log rotation)"
+            }
           ],
           "notes": "tail -f is essential for monitoring logs - press Ctrl+C to stop following"
         }
@@ -382,14 +559,37 @@
             {
               "command": "grep -v 'debug' log.txt",
               "description": "Show lines NOT containing 'debug'"
+            },
+            {
+              "command": "grep -A 2 -B 1 'ERROR' log.txt",
+              "description": "Show 2 lines after, 1 before match"
             }
           ],
           "details": [
-            {"label": "-i", "value": "Ignore case"},
-            {"label": "-r", "value": "Recursive search in directories"},
-            {"label": "-n", "value": "Show line numbers"},
-            {"label": "-v", "value": "Invert match (show non-matching lines)"},
-            {"label": "-c", "value": "Count matching lines"}
+            {
+              "label": "-i",
+              "value": "Ignore case"
+            },
+            {
+              "label": "-r",
+              "value": "Recursive search in directories"
+            },
+            {
+              "label": "-n",
+              "value": "Show line numbers"
+            },
+            {
+              "label": "-v",
+              "value": "Invert match (show non-matching lines)"
+            },
+            {
+              "label": "-c",
+              "value": "Count matching lines"
+            },
+            {
+              "label": "-A/B/C N",
+              "value": "Context lines after/before/around"
+            }
           ],
           "notes": "One of the most useful commands - essential for log analysis"
         },
@@ -420,14 +620,37 @@
             {
               "command": "find . -type d -name 'temp'",
               "description": "Find directories named 'temp'"
+            },
+            {
+              "command": "find . -name '*.tmp' -exec rm {} +",
+              "description": "Delete with confirmation"
             }
           ],
           "details": [
-            {"label": "-name pattern", "value": "Search by filename"},
-            {"label": "-type f/d", "value": "Find files (f) or directories (d)"},
-            {"label": "-size +N", "value": "Larger than size (use -N for smaller)"},
-            {"label": "-mtime N", "value": "Modified N days ago (-N = within N days)"},
-            {"label": "-delete", "value": "Delete found files"}
+            {
+              "label": "-name pattern",
+              "value": "Search by filename"
+            },
+            {
+              "label": "-type f/d",
+              "value": "Find files (f) or directories (d)"
+            },
+            {
+              "label": "-size +N",
+              "value": "Larger than size (use -N for smaller)"
+            },
+            {
+              "label": "-mtime N",
+              "value": "Modified N days ago (-N = within N days)"
+            },
+            {
+              "label": "-delete",
+              "value": "Delete found files"
+            },
+            {
+              "label": "-exec cmd {} +",
+              "value": "Run command on results"
+            }
           ],
           "notes": "Very powerful - be careful with -delete option, test search first!"
         },
@@ -454,13 +677,29 @@
             {
               "command": "sed '/^#/d' file.txt",
               "description": "Delete all comment lines (starting with #)"
+            },
+            {
+              "command": "sed -i.bak 's/error/ERROR/g' log.txt",
+              "description": "Edit with backup"
             }
           ],
           "details": [
-            {"label": "s/old/new/g", "value": "Substitute (g = global, all occurrences)"},
-            {"label": "-i", "value": "Edit file in-place"},
-            {"label": "-n", "value": "Suppress output (use with p command)"},
-            {"label": "d", "value": "Delete matching lines"}
+            {
+              "label": "s/old/new/g",
+              "value": "Substitute (g = global, all occurrences)"
+            },
+            {
+              "label": "-i",
+              "value": "Edit file in-place"
+            },
+            {
+              "label": "-n",
+              "value": "Suppress output (use with p command)"
+            },
+            {
+              "label": "d",
+              "value": "Delete matching lines"
+            }
           ],
           "notes": "Powerful for batch text transformations - test without -i first!"
         },
@@ -487,13 +726,29 @@
             {
               "command": "awk 'NR==5' file.txt",
               "description": "Print only line 5"
+            },
+            {
+              "command": "awk '{sum+=$3} END {print sum}' numbers.txt",
+              "description": "Calculate sum of column 3"
             }
           ],
           "details": [
-            {"label": "$1, $2, $3", "value": "Column references (fields)"},
-            {"label": "-F", "value": "Set field separator"},
-            {"label": "NR", "value": "Line number (record number)"},
-            {"label": "NF", "value": "Number of fields in current line"}
+            {
+              "label": "$1, $2, $3",
+              "value": "Column references (fields)"
+            },
+            {
+              "label": "-F",
+              "value": "Set field separator"
+            },
+            {
+              "label": "NR",
+              "value": "Line number (record number)"
+            },
+            {
+              "label": "NF",
+              "value": "Number of fields in current line"
+            }
           ],
           "notes": "Best for working with columnar data like logs, CSV files, or command output"
         },
@@ -516,14 +771,117 @@
             {
               "command": "find . -name '*.py' | wc -l",
               "description": "Count number of Python files"
+            },
+            {
+              "command": "wc -L file.txt",
+              "description": "Show length of longest line"
             }
           ],
           "details": [
-            {"label": "-l", "value": "Count lines only"},
-            {"label": "-w", "value": "Count words only"},
-            {"label": "-c", "value": "Count characters only"}
+            {
+              "label": "-l",
+              "value": "Count lines only"
+            },
+            {
+              "label": "-w",
+              "value": "Count words only"
+            },
+            {
+              "label": "-c",
+              "value": "Count characters only"
+            },
+            {
+              "label": "-L",
+              "value": "Longest line length"
+            }
           ],
           "notes": "Often combined with pipes to count results from other commands"
+        },
+        {
+          "id": "sort",
+          "name": "sort",
+          "description": "Sort lines of text",
+          "content": {
+            "Purpose": "Alphabetical or numeric sorting"
+          },
+          "examples": [
+            {
+              "command": "sort file.txt",
+              "description": "Sort lines alphabetically"
+            },
+            {
+              "command": "sort -r file.txt",
+              "description": "Reverse order"
+            },
+            {
+              "command": "sort -n numbers.txt",
+              "description": "Numeric sort"
+            },
+            {
+              "command": "sort -k 3 data.txt",
+              "description": "Sort by 3rd column"
+            },
+            {
+              "command": "sort -u duplicates.txt",
+              "description": "Remove duplicates"
+            }
+          ],
+          "details": [
+            {
+              "label": "-r",
+              "value": "Reverse"
+            },
+            {
+              "label": "-n",
+              "value": "Numeric"
+            },
+            {
+              "label": "-k N",
+              "value": "Sort by field N"
+            },
+            {
+              "label": "-u",
+              "value": "Unique lines"
+            }
+          ],
+          "notes": "Use with uniq for advanced deduplication"
+        },
+        {
+          "id": "uniq",
+          "name": "uniq",
+          "description": "Remove duplicate lines",
+          "content": {
+            "Purpose": "Filter adjacent duplicate lines"
+          },
+          "examples": [
+            {
+              "command": "sort file.txt | uniq",
+              "description": "Remove duplicates (after sorting)"
+            },
+            {
+              "command": "uniq -c file.txt",
+              "description": "Count occurrences"
+            },
+            {
+              "command": "uniq -d file.txt",
+              "description": "Show only duplicates"
+            }
+          ],
+          "details": [
+            {
+              "label": "-c",
+              "value": "Prefix with count"
+            },
+            {
+              "label": "-d",
+              "value": "Only duplicated lines"
+            },
+            {
+              "label": "-u",
+              "value": "Only unique lines"
+            }
+          ],
+          "notes": "Must sort first for non-adjacent duplicates"
         }
       ]
     },
@@ -547,15 +905,37 @@
             {
               "command": "nano +10 file.txt",
               "description": "Open file at line 10"
+            },
+            {
+              "command": "nano -B file.txt",
+              "description": "Always create backup"
             }
           ],
           "details": [
-            {"label": "Ctrl+O", "value": "Save (Write Out)"},
-            {"label": "Ctrl+X", "value": "Exit"},
-            {"label": "Ctrl+K", "value": "Cut line"},
-            {"label": "Ctrl+U", "value": "Paste"},
-            {"label": "Ctrl+W", "value": "Search"},
-            {"label": "Ctrl+\\", "value": "Find and replace"}
+            {
+              "label": "Ctrl+O",
+              "value": "Save (Write Out)"
+            },
+            {
+              "label": "Ctrl+X",
+              "value": "Exit"
+            },
+            {
+              "label": "Ctrl+K",
+              "value": "Cut line"
+            },
+            {
+              "label": "Ctrl+U",
+              "value": "Paste"
+            },
+            {
+              "label": "Ctrl+W",
+              "value": "Search"
+            },
+            {
+              "label": "Ctrl+\\",
+              "value": "Find and replace"
+            }
           ],
           "notes": "Recommended for beginners - shows all commands at bottom of screen"
         },
@@ -575,19 +955,53 @@
             {
               "command": "vimtutor",
               "description": "Interactive Vim tutorial (highly recommended!)"
+            },
+            {
+              "command": "vim -d file1 file2",
+              "description": "Diff two files"
             }
           ],
           "details": [
-            {"label": "i", "value": "Enter Insert mode (start typing)"},
-            {"label": "Esc", "value": "Return to Normal mode"},
-            {"label": ":w", "value": "Save file"},
-            {"label": ":q", "value": "Quit"},
-            {"label": ":wq", "value": "Save and quit"},
-            {"label": ":q!", "value": "Quit without saving"},
-            {"label": "dd", "value": "Delete line"},
-            {"label": "yy", "value": "Copy line"},
-            {"label": "p", "value": "Paste"},
-            {"label": "/text", "value": "Search forward for 'text'"}
+            {
+              "label": "i",
+              "value": "Enter Insert mode (start typing)"
+            },
+            {
+              "label": "Esc",
+              "value": "Return to Normal mode"
+            },
+            {
+              "label": ":w",
+              "value": "Save file"
+            },
+            {
+              "label": ":q",
+              "value": "Quit"
+            },
+            {
+              "label": ":wq",
+              "value": "Save and quit"
+            },
+            {
+              "label": ":q!",
+              "value": "Quit without saving"
+            },
+            {
+              "label": "dd",
+              "value": "Delete line"
+            },
+            {
+              "label": "yy",
+              "value": "Copy line"
+            },
+            {
+              "label": "p",
+              "value": "Paste"
+            },
+            {
+              "label": "/text",
+              "value": "Search forward for 'text'"
+            }
           ],
           "notes": "Very powerful but takes time to learn - run 'vimtutor' to learn basics"
         }
@@ -625,15 +1039,37 @@
             {
               "command": "chmod -R 755 directory/",
               "description": "Recursively set permissions on all files"
+            },
+            {
+              "command": "chmod u=rwx,g=rx,o=r file.txt",
+              "description": "Symbolic mode"
             }
           ],
           "details": [
-            {"label": "7 (rwx)", "value": "Read + Write + Execute"},
-            {"label": "6 (rw-)", "value": "Read + Write"},
-            {"label": "5 (r-x)", "value": "Read + Execute"},
-            {"label": "4 (r--)", "value": "Read only"},
-            {"label": "+x", "value": "Add execute permission"},
-            {"label": "-R", "value": "Recursive (apply to all files in directory)"}
+            {
+              "label": "7 (rwx)",
+              "value": "Read + Write + Execute"
+            },
+            {
+              "label": "6 (rw-)",
+              "value": "Read + Write"
+            },
+            {
+              "label": "5 (r-x)",
+              "value": "Read + Execute"
+            },
+            {
+              "label": "4 (r--)",
+              "value": "Read only"
+            },
+            {
+              "label": "+x",
+              "value": "Add execute permission"
+            },
+            {
+              "label": "-R",
+              "value": "Recursive (apply to all files in directory)"
+            }
           ],
           "notes": "755 for scripts/programs, 644 for regular files, 700 for private files"
         },
@@ -657,11 +1093,21 @@
             {
               "command": "sudo chown -R user:group directory/",
               "description": "Recursively change ownership"
+            },
+            {
+              "command": "sudo chown --from=root user file.txt",
+              "description": "Change only if current owner is root"
             }
           ],
           "details": [
-            {"label": "-R", "value": "Recursive (all files in directory)"},
-            {"label": "-v", "value": "Verbose (show what's changed)"}
+            {
+              "label": "-R",
+              "value": "Recursive (all files in directory)"
+            },
+            {
+              "label": "-v",
+              "value": "Verbose (show what's changed)"
+            }
           ],
           "notes": "Usually requires sudo - be careful with recursive operations"
         },
@@ -680,9 +1126,54 @@
             {
               "command": "umask 022",
               "description": "Set default permissions (files: 644, dirs: 755)"
+            },
+            {
+              "command": "umask -S",
+              "description": "Show umask in symbolic format"
             }
           ],
           "notes": "umask subtracts from 666 (files) or 777 (dirs) - e.g., umask 022 gives 644 for files"
+        },
+        {
+          "id": "lsattr-chattr",
+          "name": "lsattr / chattr",
+          "description": "Extended file attributes (immutable, append-only)",
+          "content": {
+            "Purpose": "Protect critical files"
+          },
+          "examples": [
+            {
+              "command": "sudo chattr +i important.txt",
+              "description": "Make file immutable (can't delete/modify)"
+            },
+            {
+              "command": "lsattr important.txt",
+              "description": "Show attributes"
+            },
+            {
+              "command": "sudo chattr -i important.txt",
+              "description": "Remove immutable flag"
+            },
+            {
+              "command": "sudo chattr +a logfile.txt",
+              "description": "Append-only (logs)"
+            }
+          ],
+          "details": [
+            {
+              "label": "+i",
+              "value": "Immutable"
+            },
+            {
+              "label": "+a",
+              "value": "Append-only"
+            },
+            {
+              "label": "-i/-a",
+              "value": "Remove attribute"
+            }
+          ],
+          "notes": "Even root can't delete immutable files until flag is removed"
         }
       ]
     },
@@ -705,14 +1196,33 @@
             {
               "command": "top -u username",
               "description": "Show only specific user's processes"
+            },
+            {
+              "command": "top -p $(pgrep nginx)",
+              "description": "Monitor specific PIDs"
             }
           ],
           "details": [
-            {"label": "q", "value": "Quit"},
-            {"label": "k", "value": "Kill process (enter PID)"},
-            {"label": "M", "value": "Sort by memory usage"},
-            {"label": "P", "value": "Sort by CPU usage"},
-            {"label": "1", "value": "Show individual CPU cores"}
+            {
+              "label": "q",
+              "value": "Quit"
+            },
+            {
+              "label": "k",
+              "value": "Kill process (enter PID)"
+            },
+            {
+              "label": "M",
+              "value": "Sort by memory usage"
+            },
+            {
+              "label": "P",
+              "value": "Sort by CPU usage"
+            },
+            {
+              "label": "1",
+              "value": "Show individual CPU cores"
+            }
           ],
           "notes": "Press 'h' inside top for help. Look at load average and memory usage"
         },
@@ -727,13 +1237,29 @@
             {
               "command": "htop",
               "description": "Interactive process viewer"
+            },
+            {
+              "command": "htop -u www-data",
+              "description": "Show web server processes"
             }
           ],
           "details": [
-            {"label": "F6", "value": "Change sort column"},
-            {"label": "F9", "value": "Kill process"},
-            {"label": "F10/q", "value": "Quit"},
-            {"label": "Space", "value": "Tag process"}
+            {
+              "label": "F6",
+              "value": "Change sort column"
+            },
+            {
+              "label": "F9",
+              "value": "Kill process"
+            },
+            {
+              "label": "F10/q",
+              "value": "Quit"
+            },
+            {
+              "label": "Space",
+              "value": "Tag process"
+            }
           ],
           "notes": "Much easier to use than top - shows CPU bars and uses mouse support"
         },
@@ -760,12 +1286,25 @@
             {
               "command": "ps -u username",
               "description": "Show processes for specific user"
+            },
+            {
+              "command": "ps -p 1 -o comm=",
+              "description": "Get init process name"
             }
           ],
           "details": [
-            {"label": "aux", "value": "All users, detailed info (BSD style)"},
-            {"label": "-ef", "value": "Every process, full format (Unix style)"},
-            {"label": "-u user", "value": "Filter by username"}
+            {
+              "label": "aux",
+              "value": "All users, detailed info (BSD style)"
+            },
+            {
+              "label": "-ef",
+              "value": "Every process, full format (Unix style)"
+            },
+            {
+              "label": "-u user",
+              "value": "Filter by username"
+            }
           ],
           "notes": "Use with grep to find specific processes: ps aux | grep processname"
         },
@@ -792,13 +1331,29 @@
             {
               "command": "pkill -f python",
               "description": "Kill processes matching pattern"
+            },
+            {
+              "command": "kill -l",
+              "description": "List all signals"
             }
           ],
           "details": [
-            {"label": "kill PID", "value": "Send SIGTERM (graceful shutdown)"},
-            {"label": "kill -9 PID", "value": "Send SIGKILL (force kill)"},
-            {"label": "killall name", "value": "Kill all processes by name"},
-            {"label": "pkill pattern", "value": "Kill by pattern matching"}
+            {
+              "label": "kill PID",
+              "value": "Send SIGTERM (graceful shutdown)"
+            },
+            {
+              "label": "kill -9 PID",
+              "value": "Send SIGKILL (force kill)"
+            },
+            {
+              "label": "killall name",
+              "value": "Kill all processes by name"
+            },
+            {
+              "label": "pkill pattern",
+              "value": "Kill by pattern matching"
+            }
           ],
           "notes": "Try normal kill first - use kill -9 only if process won't stop"
         },
@@ -821,12 +1376,25 @@
             {
               "command": "df -h /home",
               "description": "Show space for specific filesystem"
+            },
+            {
+              "command": "df -hT",
+              "description": "Show filesystem type"
             }
           ],
           "details": [
-            {"label": "-h", "value": "Human-readable sizes (GB, MB)"},
-            {"label": "-i", "value": "Show inode information"},
-            {"label": "-T", "value": "Show filesystem type"}
+            {
+              "label": "-h",
+              "value": "Human-readable sizes (GB, MB)"
+            },
+            {
+              "label": "-i",
+              "value": "Show inode information"
+            },
+            {
+              "label": "-T",
+              "value": "Show filesystem type"
+            }
           ],
           "notes": "Watch for filesystems near 100% - can cause system problems"
         },
@@ -849,12 +1417,29 @@
             {
               "command": "du -sh /home/user | sort -h",
               "description": "Find largest directories"
+            },
+            {
+              "command": "du -ah --exclude='*.log' /var | sort -h | tail -20",
+              "description": "Find largest non-log files"
             }
           ],
           "details": [
-            {"label": "-s", "value": "Summary (total only)"},
-            {"label": "-h", "value": "Human-readable"},
-            {"label": "--max-depth=N", "value": "Limit directory depth"}
+            {
+              "label": "-s",
+              "value": "Summary (total only)"
+            },
+            {
+              "label": "-h",
+              "value": "Human-readable"
+            },
+            {
+              "label": "--max-depth=N",
+              "value": "Limit directory depth"
+            },
+            {
+              "label": "--exclude",
+              "value": "Skip matching files"
+            }
           ],
           "notes": "Use to find space hogs: du -sh /* | sort -h to see largest directories"
         },
@@ -877,14 +1462,47 @@
             {
               "command": "free -s 5",
               "description": "Update every 5 seconds"
+            },
+            {
+              "command": "free -w",
+              "description": "Show wide format (buffers/cache separate)"
             }
           ],
           "details": [
-            {"label": "-h", "value": "Human-readable (GB, MB)"},
-            {"label": "-m", "value": "Show in megabytes"},
-            {"label": "-s N", "value": "Update every N seconds"}
+            {
+              "label": "-h",
+              "value": "Human-readable (GB, MB)"
+            },
+            {
+              "label": "-m",
+              "value": "Show in megabytes"
+            },
+            {
+              "label": "-s N",
+              "value": "Update every N seconds"
+            }
           ],
           "notes": "Don't worry if 'available' memory is low - Linux uses free RAM for cache"
+        },
+        {
+          "id": "iostat",
+          "name": "iostat",
+          "description": "CPU and I/O statistics",
+          "content": {
+            "Purpose": "Monitor disk and CPU performance",
+            "Package": "sysstat"
+          },
+          "examples": [
+            {
+              "command": "iostat -xz 1",
+              "description": "Extended stats, update every second"
+            },
+            {
+              "command": "iostat -d sda1",
+              "description": "Disk stats for specific device"
+            }
+          ],
+          "notes": "Install sysstat package. Look at %util for disk saturation"
         }
       ]
     },
@@ -912,12 +1530,25 @@
             {
               "command": "sudo passwd newuser",
               "description": "Set password for user"
+            },
+            {
+              "command": "sudo useradd -G docker newuser",
+              "description": "Add to docker group"
             }
           ],
           "details": [
-            {"label": "-m", "value": "Create home directory"},
-            {"label": "-s shell", "value": "Set login shell"},
-            {"label": "-G group", "value": "Add to additional groups"}
+            {
+              "label": "-m",
+              "value": "Create home directory"
+            },
+            {
+              "label": "-s shell",
+              "value": "Set login shell"
+            },
+            {
+              "label": "-G group",
+              "value": "Add to additional groups"
+            }
           ],
           "notes": "Use 'adduser' on Debian/Ubuntu (interactive), 'useradd' on RedHat/CentOS"
         },
@@ -941,12 +1572,25 @@
             {
               "command": "sudo usermod -s /bin/bash username",
               "description": "Change user's shell"
+            },
+            {
+              "command": "sudo usermod -L username",
+              "description": "Lock account"
             }
           ],
           "details": [
-            {"label": "-aG group", "value": "Append to group (don't remove from others)"},
-            {"label": "-l newname", "value": "Change username"},
-            {"label": "-L", "value": "Lock account (disable login)"}
+            {
+              "label": "-aG group",
+              "value": "Append to group (don't remove from others)"
+            },
+            {
+              "label": "-l newname",
+              "value": "Change username"
+            },
+            {
+              "label": "-L",
+              "value": "Lock account (disable login)"
+            }
           ],
           "notes": "Always use -a with -G or you'll remove user from other groups!"
         },
@@ -966,10 +1610,21 @@
             {
               "command": "sudo userdel -r username",
               "description": "Delete user and remove home directory"
+            },
+            {
+              "command": "sudo userdel -f username",
+              "description": "Force removal even if logged in"
             }
           ],
           "details": [
-            {"label": "-r", "value": "Remove home directory and mail spool"}
+            {
+              "label": "-r",
+              "value": "Remove home directory and mail spool"
+            },
+            {
+              "label": "-f",
+              "value": "Force removal"
+            }
           ],
           "notes": "Backup important data before using -r!"
         },
@@ -988,6 +1643,10 @@
             {
               "command": "groups username",
               "description": "Show another user's groups"
+            },
+            {
+              "command": "id username",
+              "description": "Show UID, GID, and groups"
             }
           ],
           "notes": "Groups control file access permissions - common groups: sudo, docker, www-data"
@@ -1015,12 +1674,25 @@
             {
               "command": "sudo !!",
               "description": "Re-run previous command with sudo"
+            },
+            {
+              "command": "sudo visudo",
+              "description": "Safely edit sudoers file"
             }
           ],
           "details": [
-            {"label": "-i", "value": "Start login shell as root"},
-            {"label": "-u user", "value": "Run as specific user"},
-            {"label": "-l", "value": "List allowed commands"}
+            {
+              "label": "-i",
+              "value": "Start login shell as root"
+            },
+            {
+              "label": "-u user",
+              "value": "Run as specific user"
+            },
+            {
+              "label": "-l",
+              "value": "List allowed commands"
+            }
           ],
           "notes": "Safer than logging in as root - user must be in sudo group"
         }
@@ -1066,55 +1738,89 @@
             {
               "command": "sudo apt autoremove",
               "description": "Remove unused dependencies"
+            },
+            {
+              "command": "sudo apt full-upgrade",
+              "description": "Upgrade with dependency resolution"
             }
           ],
           "details": [
-            {"label": "update", "value": "Refresh package lists"},
-            {"label": "upgrade", "value": "Install available updates"},
-            {"label": "install", "value": "Add new package"},
-            {"label": "remove", "value": "Uninstall package"},
-            {"label": "purge", "value": "Remove including configs"},
-            {"label": "autoremove", "value": "Clean up unused packages"}
+            {
+              "label": "update",
+              "value": "Refresh package lists"
+            },
+            {
+              "label": "upgrade",
+              "value": "Install available updates"
+            },
+            {
+              "label": "install",
+              "value": "Add new package"
+            },
+            {
+              "label": "remove",
+              "value": "Uninstall package"
+            },
+            {
+              "label": "purge",
+              "value": "Remove including configs"
+            },
+            {
+              "label": "autoremove",
+              "value": "Clean up unused packages"
+            }
           ],
           "notes": "Always run 'sudo apt update' before installing or upgrading packages"
         },
         {
           "id": "yum",
-          "name": "yum (RHEL/CentOS)",
+          "name": "yum / dnf",
           "description": "Package manager for RedHat-based systems",
           "content": {
-            "Distros": "RHEL, CentOS, Fedora (older versions)",
+            "Distros": "RHEL, CentOS, Fedora",
             "Purpose": "Manage RPM packages"
           },
           "examples": [
             {
-              "command": "sudo yum update",
-              "description": "Update all packages"
+              "command": "sudo dnf update",
+              "description": "Update all packages (Fedora/RHEL8+)"
             },
             {
               "command": "sudo yum install package-name",
-              "description": "Install new package"
+              "description": "Install new package (CentOS7)"
             },
             {
-              "command": "sudo yum remove package-name",
+              "command": "sudo dnf remove package-name",
               "description": "Uninstall package"
             },
             {
-              "command": "yum search keyword",
+              "command": "dnf search keyword",
               "description": "Search for packages"
             },
             {
-              "command": "yum list installed",
+              "command": "dnf list installed",
               "description": "List all installed packages"
             }
           ],
           "details": [
-            {"label": "update", "value": "Update all packages"},
-            {"label": "install", "value": "Add package"},
-            {"label": "remove", "value": "Uninstall package"},
-            {"label": "search", "value": "Find packages"}
+            {
+              "label": "update",
+              "value": "Update all packages"
+            },
+            {
+              "label": "install",
+              "value": "Add package"
+            },
+            {
+              "label": "remove",
+              "value": "Uninstall package"
+            },
+            {
+              "label": "search",
+              "value": "Find packages"
+            }
           ],
-          "notes": "Newer Fedora and RHEL 8+ use 'dnf' instead (compatible commands)"
+          "notes": "dnf is successor to yum - same commands work"
         },
         {
           "id": "snap",
@@ -1140,9 +1846,36 @@
             {
               "command": "snap list",
               "description": "List installed snaps"
+            },
+            {
+              "command": "snap refresh",
+              "description": "Update all snaps"
             }
           ],
           "notes": "Self-contained packages - larger but work across different Linux distributions"
+        },
+        {
+          "id": "flatpak",
+          "name": "flatpak",
+          "description": "Universal app distribution",
+          "content": {
+            "Purpose": "Install GUI/desktop apps"
+          },
+          "examples": [
+            {
+              "command": "flatpak search spotify",
+              "description": "Search apps"
+            },
+            {
+              "command": "flatpak install flathub org.spotify.Client",
+              "description": "Install from Flathub"
+            },
+            {
+              "command": "flatpak list",
+              "description": "List installed"
+            }
+          ],
+          "notes": "Great for GUI apps - add flathub.org repo first"
         }
       ]
     },
@@ -1169,12 +1902,25 @@
             {
               "command": "uname -m",
               "description": "Show machine architecture (x86_64, arm64, etc.)"
+            },
+            {
+              "command": "uname -o",
+              "description": "Show operating system"
             }
           ],
           "details": [
-            {"label": "-a", "value": "All information"},
-            {"label": "-r", "value": "Kernel release"},
-            {"label": "-m", "value": "Machine hardware name"}
+            {
+              "label": "-a",
+              "value": "All information"
+            },
+            {
+              "label": "-r",
+              "value": "Kernel release"
+            },
+            {
+              "label": "-m",
+              "value": "Machine hardware name"
+            }
           ],
           "notes": "Useful for checking kernel version and architecture"
         },
@@ -1197,6 +1943,10 @@
             {
               "command": "sudo hostnamectl set-hostname newhostname",
               "description": "Change hostname permanently"
+            },
+            {
+              "command": "hostnamectl",
+              "description": "Show full system info"
             }
           ],
           "notes": "Hostname identifies your computer on the network"
@@ -1216,6 +1966,10 @@
             {
               "command": "uptime -p",
               "description": "Show uptime in pretty format"
+            },
+            {
+              "command": "uptime -s",
+              "description": "Show boot time"
             }
           ],
           "notes": "Load average shows system load over 1, 5, and 15 minutes"
@@ -1231,6 +1985,10 @@
             {
               "command": "whoami",
               "description": "Show your username"
+            },
+            {
+              "command": "logname",
+              "description": "Show original login name (even after su)"
             }
           ],
           "notes": "Simple command to check which user you're logged in as"
@@ -1250,9 +2008,55 @@
             {
               "command": "who",
               "description": "Simpler list of logged-in users"
+            },
+            {
+              "command": "last",
+              "description": "Show login history"
             }
           ],
           "notes": "Useful on multi-user systems to see who's logged in"
+        },
+        {
+          "id": "lscpu",
+          "name": "lscpu",
+          "description": "CPU architecture information",
+          "content": {
+            "Purpose": "Detailed CPU info"
+          },
+          "examples": [
+            {
+              "command": "lscpu",
+              "description": "Show CPU details"
+            },
+            {
+              "command": "lscpu | grep -i model",
+              "description": "Show CPU model"
+            }
+          ],
+          "notes": "Shows cores, threads, cache, virtualization support"
+        },
+        {
+          "id": "lsblk",
+          "name": "lsblk",
+          "description": "List block devices",
+          "content": {
+            "Purpose": "Show disks, partitions, mount points"
+          },
+          "examples": [
+            {
+              "command": "lsblk",
+              "description": "Tree view of block devices"
+            },
+            {
+              "command": "lsblk -f",
+              "description": "Show filesystem types"
+            },
+            {
+              "command": "lsblk -o NAME,SIZE,TYPE,MOUNTPOINT",
+              "description": "Custom columns"
+            }
+          ],
+          "notes": "Great for understanding disk layout"
         }
       ]
     },
@@ -1283,15 +2087,41 @@
             {
               "command": "tar -xzf archive.tar.gz -C /destination/",
               "description": "Extract to specific directory"
+            },
+            {
+              "command": "tar -cjf archive.tar.bz2 folder/",
+              "description": "Better compression (bzip2)"
             }
           ],
           "details": [
-            {"label": "-c", "value": "Create archive"},
-            {"label": "-x", "value": "Extract archive"},
-            {"label": "-z", "value": "Use gzip compression"},
-            {"label": "-f", "value": "File name"},
-            {"label": "-v", "value": "Verbose (show files)"},
-            {"label": "-C dir", "value": "Change to directory"}
+            {
+              "label": "-c",
+              "value": "Create archive"
+            },
+            {
+              "label": "-x",
+              "value": "Extract archive"
+            },
+            {
+              "label": "-z",
+              "value": "Use gzip compression"
+            },
+            {
+              "label": "-j",
+              "value": "Use bzip2 compression"
+            },
+            {
+              "label": "-f",
+              "value": "File name"
+            },
+            {
+              "label": "-v",
+              "value": "Verbose (show files)"
+            },
+            {
+              "label": "-C dir",
+              "value": "Change to directory"
+            }
           ],
           "notes": "Remember: 'czf' to create, 'xzf' to extract. Add 'v' for verbose output"
         },
@@ -1318,12 +2148,25 @@
             {
               "command": "unzip -l archive.zip",
               "description": "List contents without extracting"
+            },
+            {
+              "command": "unzip -p archive.zip file.txt",
+              "description": "Extract single file to stdout"
             }
           ],
           "details": [
-            {"label": "-r", "value": "Recursive (for directories)"},
-            {"label": "-l", "value": "List contents"},
-            {"label": "-d dir", "value": "Extract to directory"}
+            {
+              "label": "-r",
+              "value": "Recursive (for directories)"
+            },
+            {
+              "label": "-l",
+              "value": "List contents"
+            },
+            {
+              "label": "-d dir",
+              "value": "Extract to directory"
+            }
           ],
           "notes": "ZIP format is cross-platform - works on Windows, Mac, Linux"
         },
@@ -1346,42 +2189,83 @@
             {
               "command": "gzip -k file.txt",
               "description": "Compress but keep original file"
+            },
+            {
+              "command": "zcat file.txt.gz",
+              "description": "View without decompressing"
             }
           ],
           "details": [
-            {"label": "-k", "value": "Keep original file"},
-            {"label": "-d", "value": "Decompress (same as gunzip)"}
+            {
+              "label": "-k",
+              "value": "Keep original file"
+            },
+            {
+              "label": "-d",
+              "value": "Decompress (same as gunzip)"
+            }
           ],
           "notes": "gzip only compresses single files - use tar for directories"
         }
       ]
     },
     {
-      "id": "networking-basics",
-      "name": "Basic Networking",
+      "id": "networking",
+      "name": "Networking",
       "entries": [
         {
-          "id": "ip-addr",
-          "name": "ip addr",
-          "description": "Show network interfaces and IP addresses",
+          "id": "ip",
+          "name": "ip",
+          "description": "Modern network configuration tool",
           "content": {
-            "Purpose": "Display network configuration"
+            "Purpose": "Manage interfaces, addresses, routes"
           },
           "examples": [
             {
-              "command": "ip addr",
-              "description": "Show all network interfaces and IPs"
-            },
-            {
-              "command": "ip addr show eth0",
-              "description": "Show specific interface"
+              "command": "ip addr show",
+              "description": "Show all interfaces and IPs"
             },
             {
               "command": "ip link show",
-              "description": "Show interface status (up/down)"
+              "description": "Show interface status"
+            },
+            {
+              "command": "ip route show",
+              "description": "Show routing table"
+            },
+            {
+              "command": "ip neigh show",
+              "description": "Show ARP table"
+            },
+            {
+              "command": "sudo ip addr add 192.168.1.100/24 dev eth0",
+              "description": "Add IP address"
             }
           ],
-          "notes": "Modern replacement for 'ifconfig' command"
+          "notes": "Replaces ifconfig, netstat, route, arp"
+        },
+        {
+          "id": "ss",
+          "name": "ss",
+          "description": "Socket statistics (modern netstat)",
+          "content": {
+            "Purpose": "Show network connections"
+          },
+          "examples": [
+            {
+              "command": "ss -tuln",
+              "description": "Show listening TCP/UDP ports"
+            },
+            {
+              "command": "ss -tunap",
+              "description": "Show all connections with process"
+            },
+            {
+              "command": "ss -K dst 192.168.1.100",
+              "description": "Kill connections to IP"
+            }
+          ],
+          "notes": "Faster and more powerful than netstat"
         },
         {
           "id": "ping",
@@ -1398,19 +2282,53 @@
             {
               "command": "ping -c 4 192.168.1.1",
               "description": "Send only 4 packets"
+            },
+            {
+              "command": "ping -i 0.2 192.168.1.1",
+              "description": "Fast ping (0.2s interval)"
             }
           ],
           "details": [
-            {"label": "-c N", "value": "Send N packets then stop"}
+            {
+              "label": "-c N",
+              "value": "Send N packets then stop"
+            },
+            {
+              "label": "-i N",
+              "value": "Interval between packets"
+            }
           ],
           "notes": "Press Ctrl+C to stop. Look for '0% packet loss' for good connection"
         },
         {
-          "id": "wget-curl-simple",
-          "name": "wget / curl",
-          "description": "Download files from internet",
+          "id": "traceroute",
+          "name": "traceroute / mtr",
+          "description": "Trace route to destination",
           "content": {
-            "Purpose": "Fetch files via HTTP/HTTPS"
+            "Purpose": "Show path packets take"
+          },
+          "examples": [
+            {
+              "command": "traceroute google.com",
+              "description": "Show hop-by-hop path"
+            },
+            {
+              "command": "mtr google.com",
+              "description": "Live traceroute with stats"
+            },
+            {
+              "command": "mtr -c 10 google.com",
+              "description": "Run 10 cycles then quit"
+            }
+          ],
+          "notes": "mtr combines ping + traceroute with real-time stats"
+        },
+        {
+          "id": "curl-wget",
+          "name": "curl / wget",
+          "description": "Download files and test APIs",
+          "content": {
+            "Purpose": "HTTP/HTTPS client tools"
           },
           "examples": [
             {
@@ -1419,10 +2337,236 @@
             },
             {
               "command": "curl -O https://example.com/file.zip",
-              "description": "Download file with curl"
+              "description": "Download with curl"
+            },
+            {
+              "command": "curl -I https://example.com",
+              "description": "Show headers only"
+            },
+            {
+              "command": "curl -s -w '%{http_code}' https://api.example.com",
+              "description": "Get HTTP status code"
             }
           ],
-          "notes": "wget is simpler for downloads, curl is better for APIs"
+          "notes": "curl for APIs/scripts, wget for simple downloads"
+        },
+        {
+          "id": "dig-nslookup",
+          "name": "dig / nslookup",
+          "description": "DNS lookup tools",
+          "content": {
+            "Purpose": "Query DNS records"
+          },
+          "examples": [
+            {
+              "command": "dig google.com",
+              "description": "Full DNS query"
+            },
+            {
+              "command": "dig +short google.com",
+              "description": "Just IP address"
+            },
+            {
+              "command": "dig MX example.com",
+              "description": "Mail server records"
+            },
+            {
+              "command": "nslookup google.com",
+              "description": "Interactive lookup"
+            }
+          ],
+          "notes": "dig is more powerful, nslookup is simpler"
+        },
+        {
+          "id": "netcat",
+          "name": "nc / netcat",
+          "description": "Network debugging and port testing",
+          "content": {
+            "Purpose": "TCP/UDP connectivity"
+          },
+          "examples": [
+            {
+              "command": "nc -zv 192.168.1.1 22",
+              "description": "Test if SSH port is open"
+            },
+            {
+              "command": "nc -l 12345",
+              "description": "Listen on port 12345"
+            },
+            {
+              "command": "echo 'GET / HTTP/1.0' | nc example.com 80",
+              "description": "Manual HTTP request"
+            }
+          ],
+          "notes": "Swiss army knife of networking"
+        }
+      ]
+    },
+    {
+      "id": "systemd",
+      "name": "Systemd & Services",
+      "entries": [
+        {
+          "id": "systemctl",
+          "name": "systemctl",
+          "description": "Control systemd services",
+          "content": {
+            "Purpose": "Manage system services"
+          },
+          "examples": [
+            {
+              "command": "systemctl status ssh",
+              "description": "Check service status"
+            },
+            {
+              "command": "sudo systemctl start ssh",
+              "description": "Start service"
+            },
+            {
+              "command": "sudo systemctl enable ssh",
+              "description": "Enable at boot"
+            },
+            {
+              "command": "sudo systemctl restart nginx",
+              "description": "Restart web server"
+            },
+            {
+              "command": "systemctl list-units --type=service",
+              "description": "List all services"
+            }
+          ],
+          "notes": "Most modern Linux uses systemd"
+        },
+        {
+          "id": "journalctl",
+          "name": "journalctl",
+          "description": "Query systemd logs",
+          "content": {
+            "Purpose": "View system and service logs"
+          },
+          "examples": [
+            {
+              "command": "journalctl -f",
+              "description": "Follow logs in real-time"
+            },
+            {
+              "command": "journalctl -u nginx",
+              "description": "Show nginx service logs"
+            },
+            {
+              "command": "journalctl --since '1 hour ago'",
+              "description": "Logs from last hour"
+            },
+            {
+              "command": "journalctl -p err",
+              "description": "Show only errors"
+            }
+          ],
+          "notes": "Replaces traditional log files in /var/log"
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "name": "Essential Tools",
+      "entries": [
+        {
+          "id": "tree",
+          "name": "tree",
+          "description": "Display directory structure as tree",
+          "content": {
+            "Purpose": "Visual file hierarchy"
+          },
+          "examples": [
+            {
+              "command": "tree",
+              "description": "Show current directory tree"
+            },
+            {
+              "command": "tree -L 2",
+              "description": "Limit depth to 2 levels"
+            },
+            {
+              "command": "tree -a",
+              "description": "Show hidden files"
+            }
+          ],
+          "notes": "Install with: sudo apt install tree"
+        },
+        {
+          "id": "tmux",
+          "name": "tmux",
+          "description": "Terminal multiplexer",
+          "content": {
+            "Purpose": "Session persistence, split panes"
+          },
+          "examples": [
+            {
+              "command": "tmux",
+              "description": "Start new session"
+            },
+            {
+              "command": "tmux attach",
+              "description": "Reattach to detached session"
+            },
+            {
+              "command": "tmux ls",
+              "description": "List sessions"
+            }
+          ],
+          "details": [
+            {
+              "label": "Ctrl+b %",
+              "value": "Split vertically"
+            },
+            {
+              "label": "Ctrl+b \"",
+              "value": "Split horizontally"
+            },
+            {
+              "label": "Ctrl+b d",
+              "value": "Detach"
+            }
+          ],
+          "notes": "Survives SSH disconnects"
+        },
+        {
+          "id": "rsync",
+          "name": "rsync",
+          "description": "Remote file sync",
+          "content": {
+            "Purpose": "Efficient file transfer and backup"
+          },
+          "examples": [
+            {
+              "command": "rsync -avz /src/ user@remote:/dest/",
+              "description": "Sync directory over SSH"
+            },
+            {
+              "command": "rsync -av --delete /src/ /backup/",
+              "description": "Mirror with delete"
+            }
+          ],
+          "notes": "Faster than scp for large/incremental transfers"
+        },
+        {
+          "id": "watch",
+          "name": "watch",
+          "description": "Run command periodically",
+          "content": {
+            "Purpose": "Monitor command output"
+          },
+          "examples": [
+            {
+              "command": "watch -n 1 'df -h'",
+              "description": "Update every second"
+            },
+            {
+              "command": "watch -d free -h",
+              "description": "Highlight changes"
+            }
+          ],
+          "notes": "Press Ctrl+C to stop"
         }
       ]
     }
