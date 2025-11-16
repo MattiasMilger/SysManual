@@ -1,0 +1,153 @@
+{
+  "id": "python-sysmanual",
+  "name": "Python SysManual",
+  "description": "Essential Python commands, syntax, and tools for developers",
+  "theme": { "primary": "#3776AB", "accent": "#FFD43B" },
+  "categories": [
+    {
+      "id": "basics",
+      "name": "Python Basics",
+      "entries": [
+        {
+          "id": "python-run",
+          "name": "Run Python",
+          "description": "Execute scripts and manage virtual environments",
+          "examples": [
+            { "command": "python script.py", "description": "Run script" },
+            { "command": "python -i", "description": "Interactive mode" },
+            { "command": "python -m venv myenv", "description": "Create virtual environment" },
+            { "command": "myenv\\Scripts\\activate", "description": "Activate (Windows)" }
+          ]
+        },
+        {
+          "id": "pip",
+          "name": "pip",
+          "description": "Python package manager",
+          "examples": [
+            { "command": "pip install requests", "description": "Install package" },
+            { "command": "pip list", "description": "List installed" },
+            { "command": "pip freeze > requirements.txt", "description": "Export dependencies" },
+            { "command": "pip install -r requirements.txt", "description": "Install from file" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "syntax",
+      "name": "Core Syntax",
+      "entries": [
+        {
+          "id": "variables",
+          "name": "Variables & Types",
+          "description": "Basic data types and assignment",
+          "content": {
+            "Examples": "x = 10\nname = \"Mattias\"\nactive = True\nprices = [1.5, 2.0]\nuser = {'name': 'Mattias'}"
+          }
+        },
+        {
+          "id": "control",
+          "name": "Control Flow",
+          "description": "Conditional and looping constructs",
+          "content": {
+            "if": "if x > 0: print(\"Positive\")",
+            "for": "for i in range(5): print(i)",
+            "while": "while x < 10: x += 1",
+            "try": "try: ... except ValueError: ..."
+          }
+        },
+        {
+          "id": "functions",
+          "name": "Functions",
+          "description": "Define reusable code blocks",
+          "content": {
+            "def": "def greet(name): return f\"Hello {name}\"",
+            "lambda": "square = lambda x: x*x",
+            "docstring": "\"\"\"Calculate square\"\"\""
+          }
+        }
+      ]
+    },
+    {
+      "id": "modules",
+      "name": "Standard Library",
+      "entries": [
+        {
+          "id": "os",
+          "name": "os — Operating System",
+          "description": "Interact with the operating system",
+          "examples": [
+            { "command": "import os", "description": "" },
+            { "command": "os.getcwd()", "description": "Current directory" },
+            { "command": "os.listdir('.')", "description": "List files" },
+            { "command": "os.path.join('dir', 'file.txt')", "description": "Safe path" }
+          ]
+        },
+        {
+          "id": "sys",
+          "name": "sys — System Parameters",
+          "description": "Access system-specific parameters and functions",
+          "examples": [
+            { "command": "sys.argv", "description": "Command-line args" },
+            { "command": "sys.exit(0)", "description": "Exit program" },
+            { "command": "sys.path", "description": "Module search path" }
+          ]
+        },
+        {
+          "id": "json",
+          "name": "json — JSON Handling",
+          "description": "Encode/decode JSON data",
+          "examples": [
+            { "command": "json.dumps(data)", "description": "Object → string" },
+            { "command": "json.loads(string)", "description": "String → object" }
+          ]
+        },
+        {
+          "id": "datetime",
+          "name": "datetime — Dates & Times",
+          "description": "Manipulate dates and times",
+          "examples": [
+            { "command": "datetime.now()", "description": "Current time" },
+            { "command": "date.strftime('%Y-%m-%d')", "description": "Format date" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tools",
+      "name": "Dev Tools",
+      "entries": [
+        {
+          "id": "pdb",
+          "name": "pdb — Debugger",
+          "description": "Interactive Python debugger",
+          "examples": [
+            { "command": "python -m pdb script.py", "description": "Start debugger" },
+            { "command": "import pdb; pdb.set_trace()", "description": "Breakpoint" }
+          ],
+          "details": [
+            { "label": "n", "value": "Next line" },
+            { "label": "c", "value": "Continue" },
+            { "label": "p var", "value": "Print variable" }
+          ]
+        },
+        {
+          "id": "unittest",
+          "name": "unittest",
+          "description": "Unit testing framework",
+          "examples": [
+            { "command": "python -m unittest discover", "description": "Run all tests" }
+          ]
+        },
+        {
+          "id": "black",
+          "name": "black / flake8",
+          "description": "Code formatter and linter",
+          "examples": [
+            { "command": "black .", "description": "Auto-format code" },
+            { "command": "flake8 script.py", "description": "Lint check" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,208 @@
+{
+  "id": "powershell-sysmanual",
+  "name": "PowerShell SysManual",
+  "description": "Essential PowerShell cmdlets for Windows administration & scripting",
+  "theme": { "primary": "#012169", "accent": "#00A1F1" },
+  "categories": [
+    {
+      "id": "core",
+      "name": "Core Cmdlets",
+      "entries": [
+        {
+          "id": "get-command",
+          "name": "Get-Command",
+          "description": "Discover available cmdlets, functions, aliases",
+          "content": { "Purpose": "List all commands" },
+          "examples": [
+            { "command": "Get-Command", "description": "All commands" },
+            { "command": "Get-Command -Verb Get", "description": "Cmdlets starting with Get-" },
+            { "command": "Get-Command -Module ActiveDirectory", "description": "From specific module" }
+          ],
+          "details": [
+            { "label": "-Noun", "value": "Filter by noun" },
+            { "label": "-Module", "value": "Filter by module" }
+          ],
+          "notes": "Use * wildcard: Get-Command *Process*"
+        },
+        {
+          "id": "get-help",
+          "name": "Get-Help",
+          "description": "View cmdlet documentation",
+          "content": { "Purpose": "Built-in help system" },
+          "examples": [
+            { "command": "Get-Help Get-Process", "description": "Basic help" },
+            { "command": "Get-Help Get-Process -Examples", "description": "Only examples" },
+            { "command": "Get-Help Get-Process -Full", "description": "Complete reference" },
+            { "command": "Update-Help", "description": "Download latest help" }
+          ],
+          "notes": "Run Update-Help as admin monthly"
+        },
+        {
+          "id": "get-process",
+          "name": "Get-Process",
+          "description": "List running processes",
+          "content": { "Purpose": "Monitor processes" },
+          "examples": [
+            { "command": "Get-Process", "description": "All processes" },
+            { "command": "Get-Process -Name chrome", "description": "Filter by name" },
+            { "command": "Get-Process | Sort CPU -Desc | Select -First 5", "description": "Top 5 CPU" },
+            { "command": "Get-Process -Id 1234", "description": "Specific PID" }
+          ]
+        },
+        {
+          "id": "stop-process",
+          "name": "Stop-Process",
+          "description": "Terminate processes",
+          "content": { "Purpose": "Kill processes" },
+          "examples": [
+            { "command": "Stop-Process -Name notepad", "description": "By name" },
+            { "command": "Stop-Process -Id 1234 -Force", "description": "Force kill" },
+            { "command": "Get-Process chrome | Stop-Process", "description": "Pipeline" }
+          ],
+          "notes": "Use -WhatIf to test"
+        }
+      ]
+    },
+    {
+      "id": "files",
+      "name": "File & Directory",
+      "entries": [
+        {
+          "id": "get-childitem",
+          "name": "Get-ChildItem (dir/ls)",
+          "description": "List files and folders",
+          "content": { "Purpose": "Navigate filesystem" },
+          "examples": [
+            { "command": "Get-ChildItem C:\\Logs", "description": "List directory" },
+            { "command": "dir -Recurse *.log", "description": "Recursive search" },
+            { "command": "ls -Force", "description": "Show hidden/system" },
+            { "command": "Get-ChildItem -Path Env:", "description": "Environment variables" }
+          ],
+          "aliases": ["dir", "ls", "gci"]
+        },
+        {
+          "id": "copy-item",
+          "name": "Copy-Item (cp/copy)",
+          "description": "Copy files/folders",
+          "content": { "Purpose": "Duplicate items" },
+          "examples": [
+            { "command": "Copy-Item file.txt C:\\Backup", "description": "Copy file" },
+            { "command": "cp -Recurse C:\\Data D:\\Archive", "description": "Copy folder" },
+            { "command": "Copy-Item -Path .\\* -Destination \\\\server\\share -Force", "description": "Network copy" }
+          ]
+        },
+        {
+          "id": "move-item",
+          "name": "Move-Item (mv/move)",
+          "description": "Move or rename files/folders",
+          "examples": [
+            { "command": "Move-Item old.txt new.txt", "description": "Rename" },
+            { "command": "mv *.log C:\\Archive", "description": "Move all logs" }
+          ]
+        },
+        {
+          "id": "remove-item",
+          "name": "Remove-Item (rm/del)",
+          "description": "Delete files/folders",
+          "examples": [
+            { "command": "Remove-Item temp.txt", "description": "Delete file" },
+            { "command": "rm -Recurse -Force C:\\Temp\\*", "description": "Delete folder contents" },
+            { "command": "del *.tmp -WhatIf", "description": "Test deletion" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "system",
+      "name": "System Management",
+      "entries": [
+        {
+          "id": "get-service",
+          "name": "Get-Service",
+          "description": "List Windows services",
+          "examples": [
+            { "command": "Get-Service", "description": "All services" },
+            { "command": "Get-Service Spooler", "description": "Specific service" },
+            { "command": "Get-Service | Where Status -eq Running", "description": "Running only" }
+          ]
+        },
+        {
+          "id": "restart-service",
+          "name": "Restart-Service",
+          "description": "Restart Windows services",
+          "examples": [
+            { "command": "Restart-Service Spooler", "description": "Restart print spooler" },
+            { "command": "Get-Service wuauserv | Restart-Service -Force", "description": "Force Windows Update" }
+          ]
+        },
+        {
+          "id": "get-eventlog",
+          "name": "Get-EventLog / Get-WinEvent",
+          "description": "Read Windows event logs",
+          "examples": [
+            { "command": "Get-EventLog System -Newest 10", "description": "Last 10 system events" },
+            { "command": "Get-WinEvent -LogName Security -MaxEvents 5", "description": "Modern API" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "network",
+      "name": "Networking",
+      "entries": [
+        {
+          "id": "test-connection",
+          "name": "Test-Connection (ping)",
+          "description": "Ping hosts",
+          "examples": [
+            { "command": "Test-Connection 8.8.8.8", "description": "Ping Google DNS" },
+            { "command": "Test-Connection dc01 -Count 2", "description": "2 pings" }
+          ]
+        },
+        {
+          "id": "get-netadapter",
+          "name": "Get-NetAdapter",
+          "description": "List network interfaces",
+          "examples": [
+            { "command": "Get-NetAdapter", "description": "All adapters" },
+            { "command": "Get-NetAdapter -Name Ethernet | Disable-NetAdapter", "description": "Disable interface" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scripting",
+      "name": "Scripting Essentials",
+      "entries": [
+        {
+          "id": "foreach",
+          "name": "ForEach-Object",
+          "description": "Loop over collections",
+          "examples": [
+            { "command": "Get-Process | ForEach-Object { $_.Name }", "description": "List names" },
+            { "command": "1..5 | % { \"Line $_\" }", "description": "Alias %" }
+          ]
+        },
+        {
+          "id": "where",
+          "name": "Where-Object",
+          "description": "Filter objects",
+          "examples": [
+            { "command": "Get-Process | Where CPU -gt 100", "description": "High CPU" },
+            { "command": "dir | ? Length -gt 1MB", "description": "Large files" }
+          ]
+        },
+        {
+          "id": "pipeline",
+          "name": "Pipeline Tips",
+          "description": "Chain cmdlets efficiently",
+          "content": { "Purpose": "Chain cmdlets" },
+          "examples": [
+            { "command": "Get-Service | Where Status -eq Stopped | Start-Service", "description": "Start stopped services" },
+            { "command": "Get-ChildItem -Recurse *.ps1 | Select FullName", "description": "Find all scripts" }
+          ]
+        }
+      ]
+    }
+  ]
+}
