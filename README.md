@@ -16,7 +16,7 @@ Save the files provided in the following structure
 
 Root folder: SysManual.py
 
-sysmanuals: linux_sysmanual.json, network_sysmanual.json
+sysmanuals: linux_sysmanual.json, network_sysmanual.json, powershell_sysmanual.json, python_sysmanual.json
 
 (json files are optional and up to you)
 
