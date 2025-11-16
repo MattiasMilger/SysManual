@@ -18,6 +18,8 @@ Root folder: SysManual.py
 
 sysmanuals: linux_sysmanual.json, network_sysmanual.json
 
+(json files are optional and up to you)
+
 ----------------------------
 
 How to Run the App:
