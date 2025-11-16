@@ -174,11 +174,8 @@ class SysManualFramework:
         toolbar = ttk.Frame(self.root)
         toolbar.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
         
-        # Open file button
-        ttk.Button(toolbar, text="Open SysManual File", command=self.open_sysmanual_file).pack(side=tk.LEFT, padx=5)
-        
         # SysManual selector
-        ttk.Label(toolbar, text="SysManual:").pack(side=tk.LEFT, padx=(15, 5))
+        ttk.Label(toolbar, text="SysManual:").pack(side=tk.LEFT, padx=5)
         self.sysmanual_var = tk.StringVar()
         self.sysmanual_combo = ttk.Combobox(
             toolbar, 
@@ -249,8 +246,11 @@ class SysManualFramework:
         canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
-        # Bind mousewheel
-        canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
+        # Bind mousewheel - always enabled for main viewer
+        def on_mousewheel(e):
+            canvas.yview_scroll(int(-1*(e.delta/120)), "units")
+        
+        canvas.bind_all("<MouseWheel>", on_mousewheel)
     
     def switch_sysmanual(self, sysmanual_id: str):
         """Switch to a different sysmanual"""
@@ -472,13 +472,6 @@ class SysManualGUIEditor:
         
         self.tree.bind('<<TreeviewSelect>>', self.on_tree_select)
         self.tree.bind('<Button-3>', self.show_context_menu)  # Right-click
-        
-        # Context menu
-        self.context_menu = tk.Menu(self.tree, tearoff=0)
-        self.context_menu.add_command(label="Add Category", command=self.add_category)
-        self.context_menu.add_command(label="Add Entry", command=self.add_entry)
-        self.context_menu.add_separator()
-        self.context_menu.add_command(label="Delete", command=self.delete_item)
     
     def setup_edit_panel(self, parent):
         # Scrollable edit panel
@@ -493,8 +486,11 @@ class SysManualGUIEditor:
         canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
-        # Bind mousewheel
-        canvas.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
+        # Bind mousewheel - always enabled for editor
+        def on_mousewheel(e):
+            canvas.yview_scroll(int(-1*(e.delta/120)), "units")
+        
+        canvas.bind_all("<MouseWheel>", on_mousewheel)
         
         # Initial message
         ttk.Label(self.edit_frame, text="Select an item to edit", 
@@ -568,6 +564,10 @@ class SysManualGUIEditor:
             for entry_idx, entry in enumerate(category.get('entries', [])):
                 self.tree.insert(cat_node, 'end', text=f"📄 {entry['name']}", 
                                values=('entry', cat_idx, entry_idx))
+        
+        # Keep focus on editor window
+        self.window.lift()
+        self.window.focus_force()
     
     def on_tree_select(self, event):
         """Handle tree selection"""
@@ -613,16 +613,6 @@ class SysManualGUIEditor:
         
         # Description
         self.create_text_field("Description:", self.current_sysmanual, 'description', height=3)
-        
-        # Theme
-        theme_frame = ttk.LabelFrame(self.edit_frame, text="Theme", padding=10)
-        theme_frame.pack(fill=tk.X, padx=10, pady=10)
-        
-        if 'theme' not in self.current_sysmanual:
-            self.current_sysmanual['theme'] = {"primary": "#4CAF50", "accent": "#2196F3"}
-        
-        self.create_field("Primary Color:", self.current_sysmanual['theme'], 'primary', parent=theme_frame)
-        self.create_field("Accent Color:", self.current_sysmanual['theme'], 'accent', parent=theme_frame)
     
     def show_category_editor(self, cat_idx):
         """Show editor for category"""
@@ -862,14 +852,38 @@ class SysManualGUIEditor:
     def show_context_menu(self, event):
         """Show context menu on right-click"""
         item = self.tree.identify_row(event.y)
-        if item:
-            self.tree.selection_set(item)
-            self.context_menu.post(event.x_root, event.y_root)
+        if not item:
+            return
+        
+        self.tree.selection_set(item)
+        values = self.tree.item(item, 'values')
+        
+        # Create context menu dynamically
+        context_menu = tk.Menu(self.tree, tearoff=0)
+        
+        if not values or values[0] == 'sysmanual':
+            # Root sysmanual - only allow adding category
+            context_menu.add_command(label="Add Category", command=self.add_category)
+        elif values[0] == 'category':
+            # Category node
+            context_menu.add_command(label="Add Entry", command=self.add_entry)
+            context_menu.add_separator()
+            context_menu.add_command(label="Move Up ↑", command=self.move_item_up)
+            context_menu.add_command(label="Move Down ↓", command=self.move_item_down)
+            context_menu.add_separator()
+            context_menu.add_command(label="Delete Category", command=self.delete_item)
+        elif values[0] == 'entry':
+            # Entry node
+            context_menu.add_command(label="Move Up ↑", command=self.move_item_up)
+            context_menu.add_command(label="Move Down ↓", command=self.move_item_down)
+            context_menu.add_separator()
+            context_menu.add_command(label="Delete Entry", command=self.delete_item)
+        
+        context_menu.post(event.x_root, event.y_root)
     
     def add_category(self):
         """Add new category"""
         if not self.current_sysmanual:
-            messagebox.showwarning("No SysManual", "Please create or load a sysmanual first.")
             return
         
         category = {
@@ -879,24 +893,20 @@ class SysManualGUIEditor:
         }
         self.current_sysmanual['categories'].append(category)
         self.populate_tree()
-        messagebox.showinfo("Success", "Category added!")
     
     def add_entry(self, cat_idx=None):
         """Add new entry"""
         if not self.current_sysmanual:
-            messagebox.showwarning("No SysManual", "Please create or load a sysmanual first.")
             return
         
         # If no category specified, use selected one
         if cat_idx is None:
             selection = self.tree.selection()
             if not selection:
-                messagebox.showwarning("No Selection", "Please select a category first.")
                 return
             
             values = self.tree.item(selection[0], 'values')
             if not values or values[0] not in ['category', 'entry']:
-                messagebox.showwarning("Invalid Selection", "Please select a category.")
                 return
             
             cat_idx = int(values[1])
@@ -913,7 +923,6 @@ class SysManualGUIEditor:
         }
         category['entries'].append(entry)
         self.populate_tree()
-        messagebox.showinfo("Success", "Entry added!")
     
     def delete_item(self):
         """Delete selected item"""
@@ -928,10 +937,11 @@ class SysManualGUIEditor:
         item_type = values[0]
         
         if item_type == 'sysmanual':
-            messagebox.showwarning("Cannot Delete", "Cannot delete the root sysmanual.")
             return
         
         if not messagebox.askyesno("Confirm Delete", f"Delete this {item_type}?"):
+            self.window.lift()
+            self.window.focus_force()
             return
         
         if item_type == 'category':
@@ -944,40 +954,153 @@ class SysManualGUIEditor:
         
         self.populate_tree()
         self.clear_edit_panel()
-        messagebox.showinfo("Success", f"{item_type.capitalize()} deleted!")
+    
+    def move_item_up(self):
+        """Move selected item up in the list"""
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        values = self.tree.item(selection[0], 'values')
+        if not values:
+            return
+        
+        item_type = values[0]
+        
+        if item_type == 'sysmanual':
+            return
+        
+        if item_type == 'category':
+            cat_idx = int(values[1])
+            if cat_idx == 0:
+                return
+            
+            # Swap with previous
+            categories = self.current_sysmanual['categories']
+            categories[cat_idx], categories[cat_idx - 1] = categories[cat_idx - 1], categories[cat_idx]
+            
+        elif item_type == 'entry':
+            cat_idx = int(values[1])
+            entry_idx = int(values[2])
+            if entry_idx == 0:
+                return
+            
+            # Swap with previous
+            entries = self.current_sysmanual['categories'][cat_idx]['entries']
+            entries[entry_idx], entries[entry_idx - 1] = entries[entry_idx - 1], entries[entry_idx]
+        
+        self.populate_tree()
+        # Try to reselect the moved item
+        self.select_item_after_move(item_type, values, -1)
+    
+    def move_item_down(self):
+        """Move selected item down in the list"""
+        selection = self.tree.selection()
+        if not selection:
+            return
+        
+        values = self.tree.item(selection[0], 'values')
+        if not values:
+            return
+        
+        item_type = values[0]
+        
+        if item_type == 'sysmanual':
+            return
+        
+        if item_type == 'category':
+            cat_idx = int(values[1])
+            categories = self.current_sysmanual['categories']
+            if cat_idx >= len(categories) - 1:
+                return
+            
+            # Swap with next
+            categories[cat_idx], categories[cat_idx + 1] = categories[cat_idx + 1], categories[cat_idx]
+            
+        elif item_type == 'entry':
+            cat_idx = int(values[1])
+            entry_idx = int(values[2])
+            entries = self.current_sysmanual['categories'][cat_idx]['entries']
+            if entry_idx >= len(entries) - 1:
+                return
+            
+            # Swap with next
+            entries[entry_idx], entries[entry_idx + 1] = entries[entry_idx + 1], entries[entry_idx]
+        
+        self.populate_tree()
+        # Try to reselect the moved item
+        self.select_item_after_move(item_type, values, 1)
+    
+    def select_item_after_move(self, item_type, old_values, direction):
+        """Reselect item after moving it"""
+        if item_type == 'category':
+            new_idx = int(old_values[1]) + direction
+            # Find the item in tree with matching values
+            for item in self.tree.get_children(self.tree.get_children()[0]):
+                if self.tree.item(item, 'values') == ('category', new_idx):
+                    self.tree.selection_set(item)
+                    self.tree.see(item)
+                    break
+        elif item_type == 'entry':
+            cat_idx = int(old_values[1])
+            new_entry_idx = int(old_values[2]) + direction
+            # Find category first
+            root = self.tree.get_children()[0]
+            categories = self.tree.get_children(root)
+            if cat_idx < len(categories):
+                cat_item = categories[cat_idx]
+                # Find entry
+                for entry_item in self.tree.get_children(cat_item):
+                    if self.tree.item(entry_item, 'values') == ('entry', cat_idx, new_entry_idx):
+                        self.tree.selection_set(entry_item)
+                        self.tree.see(entry_item)
+                        break
     
     def save_sysmanual(self):
         """Save the current sysmanual"""
         if not self.current_sysmanual:
-            messagebox.showwarning("No SysManual", "Nothing to save.")
             return
         
         if not self.framework.validate_sysmanual(self.current_sysmanual):
+            self.window.lift()
+            self.window.focus_force()
             return
+        
+        # Keep reference to editor window
+        editor_window = self.window
         
         filepath = filedialog.asksaveasfilename(
             title="Save SysManual",
             defaultextension=".json",
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
             initialdir=Path("sysmanuals") if Path("sysmanuals").exists() else Path.cwd(),
-            initialfile=f"{self.current_sysmanual['id']}_sysmanual.json"
+            initialfile=f"{self.current_sysmanual['id']}_sysmanual.json",
+            parent=self.window
         )
+        
+        # Immediately restore focus after file dialog
+        editor_window.lift()
+        editor_window.focus_force()
         
         if filepath:
             try:
                 with open(filepath, 'w', encoding='utf-8') as f:
                     json.dump(self.current_sysmanual, f, indent=2)
                 
-                messagebox.showinfo("Saved", f"Saved to {Path(filepath).name}")
+                # Just reload the data in framework without triggering any UI updates
+                self.framework.load_sysmanual_file(filepath)
                 
-                # Reload in framework
-                if self.framework.load_sysmanual_file(filepath):
-                    self.framework.sysmanual_var.set(self.current_sysmanual['id'])
-                    self.framework.switch_sysmanual(self.current_sysmanual['id'])
-                    # Update combo box
-                    self.load_combo['values'] = list(self.framework.sysmanuals.keys())
+                # Update combo box options
+                self.load_combo['values'] = list(self.framework.sysmanuals.keys())
+                
+                # Keep focus
+                editor_window.lift()
+                editor_window.focus_force()
+                
             except Exception as e:
                 messagebox.showerror("Save Error", f"Failed to save:\n{str(e)}")
+                editor_window.lift()
+                editor_window.focus_force()
 
 def main():
     root = tk.Tk()
