@@ -246,11 +246,11 @@ class SysManualFramework:
         canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
-        # Bind mousewheel - always enabled for main viewer
+        # Bind mousewheel to root window for scrolling anywhere
         def on_mousewheel(e):
             canvas.yview_scroll(int(-1*(e.delta/120)), "units")
         
-        canvas.bind_all("<MouseWheel>", on_mousewheel)
+        self.root.bind("<MouseWheel>", on_mousewheel)
     
     def switch_sysmanual(self, sysmanual_id: str):
         """Switch to a different sysmanual"""
@@ -486,11 +486,13 @@ class SysManualGUIEditor:
         canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
-        # Bind mousewheel - always enabled for editor
+        # Bind mousewheel - bind to relevant widgets in editor
         def on_mousewheel(e):
             canvas.yview_scroll(int(-1*(e.delta/120)), "units")
         
-        canvas.bind_all("<MouseWheel>", on_mousewheel)
+        # Bind to multiple widgets to ensure scrolling works anywhere in edit panel
+        for widget in [canvas, self.edit_frame, right_frame]:
+            widget.bind("<MouseWheel>", on_mousewheel)
         
         # Initial message
         ttk.Label(self.edit_frame, text="Select an item to edit", 
