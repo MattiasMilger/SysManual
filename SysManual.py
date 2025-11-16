@@ -12,7 +12,7 @@ from difflib import SequenceMatcher
 class SysManualFramework:
     def __init__(self, root):
         self.root = root
-        self.root.title("SysManual")
+        self.root.title("SysManual Framework")
         self.root.geometry("1200x800")
         
         # Data storage
@@ -140,7 +140,11 @@ class SysManualFramework:
             if self.validate_sysmanual(sysmanual_data):
                 self.sysmanuals[sysmanual_data['id']] = sysmanual_data
                 # Update combo box values
-                self.sysmanual_combo['values'] = list(self.sysmanuals.keys())
+                # If combobox not yet created, skip (setup_ui creates it before load_sysmanuals_from_directory is called in __init__)
+                try:
+                    self.sysmanual_combo['values'] = list(self.sysmanuals.keys())
+                except Exception:
+                    pass
                 return True
             return False
         except Exception as e:
@@ -196,6 +200,9 @@ class SysManualFramework:
         self.search_var.trace('w', lambda *args: self.filter_entries())
         search_entry = ttk.Entry(toolbar, textvariable=self.search_var, width=30)
         search_entry.pack(side=tk.LEFT, padx=5)
+        
+        # Advanced Search button (opens manual popup)
+        ttk.Button(toolbar, text="Advanced Search", command=self.open_advanced_search).pack(side=tk.RIGHT, padx=5)
         
         # Editor button
         ttk.Button(toolbar, text="GUI Editor", command=self.open_gui_editor).pack(side=tk.RIGHT, padx=5)
@@ -254,9 +261,8 @@ class SysManualFramework:
             self.entries_canvas.yview_scroll(int(-1*(e.delta/120)), "units")
         
         self.root.bind("<MouseWheel>", on_mousewheel)
-
     # ---------------------------
-    # Search utilities
+    # Search utilities (ultra fuzzy used only by Advanced Search)
     # ---------------------------
     def tokenize(self, text: str) -> List[str]:
         """Split text into lowercase word tokens."""
@@ -383,7 +389,6 @@ class SysManualFramework:
     # ---------------------------
     # End search utilities
     # ---------------------------
-
     def switch_sysmanual(self, sysmanual_id: str):
         """Switch to a different sysmanual"""
         if sysmanual_id not in self.sysmanuals:
@@ -413,61 +418,92 @@ class SysManualFramework:
         selection = self.category_listbox.curselection()
         if not selection or not self.current_sysmanual:
             return
-        
+
+        # OPTION A: Clicking a category cancels search
+        self.search_var.set("")
+
         sysmanual = self.sysmanuals[self.current_sysmanual]
         category_idx = selection[0]
         self.current_category = sysmanual['categories'][category_idx]['id']
-        # indicate this display is from a category switch so scroll resets
+
+        # Reset scroll to top (category change)
         self.display_entries(from_category=True)
     
     def display_entries(self, from_category: bool = False):
-        """Display entries for current category
-        
-        from_category: if True, called due to category change -> reset scroll top.
-                       if False, treat as search/filter -> preserve scroll.
-        """
-        # Clear existing entries
-        for widget in self.entries_container.winfo_children():
-            widget.destroy()
-        
-        if not self.current_sysmanual or not self.current_category:
-            if from_category and hasattr(self, "entries_canvas"):
-                try:
-                    self.entries_canvas.yview_moveto(0)
-                except Exception:
-                    pass
+        """Display entries for current category or run fast category-only search."""
+        # Clear UI
+        for w in self.entries_container.winfo_children():
+            w.destroy()
+
+        if not self.current_sysmanual:
             return
-        
+
         sysmanual = self.sysmanuals[self.current_sysmanual]
-        category = next((c for c in sysmanual['categories'] if c['id'] == self.current_category), None)
-        
-        if not category:
-            if from_category and hasattr(self, "entries_canvas"):
-                try:
-                    self.entries_canvas.yview_moveto(0)
-                except Exception:
-                    pass
-            return
-        
         search_term = (self.search_var.get() or "").strip()
-        
-        # If search term present, perform fuzzy/tokenized weighted search and get ordered results.
+
+        # -------------------------
+        # MODE 1: FAST CATEGORY-ONLY SEARCH (when typing in main search bar)
+        # -------------------------
         if search_term:
-            matched_entries = self.search_entries_in_category(category.get('entries', []), search_term)
-        else:
-            matched_entries = category.get('entries', [])
-        
-        # Create widgets for matched entries (ordered)
-        for entry in matched_entries:
+            # perform a simple and fast substring search inside the current category only
+            if not self.current_category:
+                return
+
+            category = next(
+                (c for c in sysmanual['categories'] if c['id'] == self.current_category),
+                None
+            )
+            if not category:
+                return
+
+            entries = category.get('entries', [])
+            matches = []
+            st = search_term.lower()
+
+            for e in entries:
+                # accumulate searchable text
+                textblock = (
+                    (e.get('name','') or '') + " " +
+                    (e.get('description','') or '') + " " +
+                    " ".join(str(v) for v in (e.get('content') or {}).values()) + " " +
+                    " ".join(
+                        (ex if isinstance(ex, str) else str(ex.get('command','')) )
+                        for ex in (e.get('examples') or [])
+                    ) + " " +
+                    (e.get('notes','') or '')
+                ).lower()
+
+                if st in textblock:
+                    matches.append(e)
+
+            for entry in matches:
+                self.create_entry_widget(entry)
+
+            # preserve scroll position (do not auto-scroll)
+            return
+
+        # -------------------------
+        # MODE 2: NORMAL CATEGORY VIEW (no search term)
+        # -------------------------
+        if not self.current_category:
+            return
+
+        category = next(
+            (c for c in sysmanual['categories'] if c['id'] == self.current_category),
+            None
+        )
+        if not category:
+            return
+
+        for entry in category.get('entries', []):
             self.create_entry_widget(entry)
-        
-        # Reset scroll to top when called from a category switch (Option C)
+
+        # Scroll reset ONLY for category switching
         if from_category and hasattr(self, "entries_canvas"):
             try:
                 self.entries_canvas.yview_moveto(0)
             except Exception:
                 pass
-    
     def create_entry_widget(self, entry: dict):
         """Create a widget for an entry"""
         frame = ttk.LabelFrame(self.entries_container, text=entry['name'], padding=15)
@@ -533,6 +569,29 @@ class SysManualFramework:
             notes_label = ttk.Label(frame, text=f"Note: {entry['notes']}", wraplength=700, foreground='#666')
             notes_label.pack(anchor=tk.W, pady=(5, 0))
     
+    def create_entry_widget_popup(self, entry, parent):
+        """Smaller version of entry widget for popup results."""
+        frame = ttk.LabelFrame(parent, text=entry.get('name',''), padding=10)
+        frame.pack(fill=tk.X, pady=8)
+
+        ttk.Label(frame, text=entry.get('description',''), wraplength=750).pack(anchor=tk.W)
+
+        if entry.get('examples'):
+            ttk.Label(frame, text="Examples:", font=('Arial', 9, 'bold')).pack(anchor=tk.W, pady=(5, 2))
+            for ex in entry['examples']:
+                if isinstance(ex, str):
+                    cmd = ex
+                else:
+                    cmd = ex.get('command', '')
+
+                row = ttk.Frame(frame)
+                row.pack(fill=tk.X, pady=1)
+                txt = tk.Text(row, height=1, wrap=tk.NONE, font=('Courier', 8), bg='#f9f9f9')
+                txt.insert('1.0', cmd)
+                txt.config(state=tk.DISABLED)
+                txt.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
+                ttk.Button(row, text="Copy", command=lambda c=cmd: self.copy_to_clipboard(c)).pack(side=tk.LEFT)
+    
     def show_details(self, entry: dict):
         """Show entry details in a popup"""
         popup = tk.Toplevel(self.root)
@@ -550,8 +609,7 @@ class SysManualFramework:
         text.config(state=tk.DISABLED)
     
     def filter_entries(self):
-        """Filter entries based on search"""
-        # called by search_var trace; treat as not a category switch so do NOT reset scroll
+        """Fast search inside current category only."""
         self.display_entries(from_category=False)
     
     def copy_to_clipboard(self, text: str):
@@ -563,6 +621,72 @@ class SysManualFramework:
     def open_gui_editor(self):
         """Open GUI sysmanual editor"""
         editor = SysManualGUIEditor(self.root, self)
+    # ---------------------------
+    # Advanced Search popup
+    # ---------------------------
+    def open_advanced_search(self):
+        """Open the advanced cross-category search popup."""
+        popup = tk.Toplevel(self.root)
+        popup.title("Advanced Search (Across All Categories)")
+        popup.geometry("900x700")
+        # Allow resizing (user chose B)
+        popup.resizable(True, True)
+
+        # Search field
+        query_var = tk.StringVar()
+        ttk.Label(popup, text="Search Across All Categories:", font=('Arial', 11, 'bold')).pack(anchor=tk.W, padx=10, pady=(10,4))
+        entry = ttk.Entry(popup, textvariable=query_var, width=50)
+        entry.pack(padx=10, pady=(0,10), anchor=tk.W)
+
+        # Container for results
+        results_frame = ttk.Frame(popup)
+        results_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        results_canvas = tk.Canvas(results_frame)
+        results_scroll = ttk.Scrollbar(results_frame, orient="vertical", command=results_canvas.yview)
+        container = ttk.Frame(results_canvas)
+
+        container.bind("<Configure>", lambda e: results_canvas.configure(scrollregion=results_canvas.bbox("all")))
+        results_canvas.create_window((0, 0), window=container, anchor="nw")
+        results_canvas.configure(yscrollcommand=results_scroll.set)
+
+        results_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        results_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+
+        def run_advanced_search(event=None):
+            for w in container.winfo_children():
+                w.destroy()
+
+            query = query_var.get().strip()
+            if not query:
+                return
+
+            sysmanual = self.sysmanuals.get(self.current_sysmanual)
+            if not sysmanual:
+                return
+
+            for category in sysmanual['categories']:
+                entries = category.get('entries', [])
+                matches = self.search_entries_in_category(entries, query)
+
+                if not matches:
+                    continue
+
+                # Category header
+                header = ttk.Label(
+                    container,
+                    text=f"=== {category['name']} ===",
+                    font=('Arial', 12, 'bold'),
+                    foreground="#444"
+                )
+                header.pack(anchor=tk.W, pady=(10, 3))
+
+                for entry_item in matches:
+                    self.create_entry_widget_popup(entry_item, container)
+
+        # Search button
+        ttk.Button(popup, text="Search", command=run_advanced_search).pack(anchor=tk.W, padx=10)
+        entry.bind('<Return>', run_advanced_search)
 
 class SysManualGUIEditor:
     def __init__(self, parent, framework):
@@ -730,539 +854,6 @@ class SysManualGUIEditor:
         self.window.lift()
         self.window.focus_force()
     
-    def on_tree_select(self, event):
-        """Handle tree selection"""
-        selection = self.tree.selection()
-        if not selection:
-            return
-        
-        item = selection[0]
-        values = self.tree.item(item, 'values')
-        
-        if not values:
-            return
-        
-        item_type = values[0]
-        
-        if item_type == 'sysmanual':
-            self.show_sysmanual_editor()
-        elif item_type == 'category':
-            cat_idx = int(values[1])
-            self.show_category_editor(cat_idx)
-        elif item_type == 'entry':
-            cat_idx = int(values[1])
-            entry_idx = int(values[2])
-            self.show_entry_editor(cat_idx, entry_idx)
-    
-    def clear_edit_panel(self):
-        """Clear the edit panel"""
-        for widget in self.edit_frame.winfo_children():
-            widget.destroy()
-    
-    def show_sysmanual_editor(self):
-        """Show editor for sysmanual metadata"""
-        self.clear_edit_panel()
-        
-        ttk.Label(self.edit_frame, text="SysManual Settings", 
-                 font=('Arial', 14, 'bold')).pack(anchor=tk.W, pady=(10, 20), padx=10)
-        
-        # ID
-        self.create_field("ID:", self.current_sysmanual, 'id')
-        
-        # Name
-        self.create_field("Name:", self.current_sysmanual, 'name')
-        
-        # Description
-        self.create_text_field("Description:", self.current_sysmanual, 'description', height=3)
-    
-    def show_category_editor(self, cat_idx):
-        """Show editor for category"""
-        self.clear_edit_panel()
-        
-        category = self.current_sysmanual['categories'][cat_idx]
-        
-        ttk.Label(self.edit_frame, text="Category Settings", 
-                 font=('Arial', 14, 'bold')).pack(anchor=tk.W, pady=(10, 20), padx=10)
-        
-        self.create_field("ID:", category, 'id')
-        self.create_field("Name:", category, 'name')
-        
-        # Add entry button
-        ttk.Button(self.edit_frame, text="+ Add Entry", 
-                  command=lambda: self.add_entry(cat_idx)).pack(anchor=tk.W, padx=10, pady=10)
-    
-    def show_entry_editor(self, cat_idx, entry_idx):
-        """Show editor for entry"""
-        self.clear_edit_panel()
-        
-        category = self.current_sysmanual['categories'][cat_idx]
-        entry = category['entries'][entry_idx]
-        
-        ttk.Label(self.edit_frame, text="Entry Editor", 
-                 font=('Arial', 14, 'bold')).pack(anchor=tk.W, pady=(10, 20), padx=10)
-        
-        # Basic fields
-        self.create_field("ID:", entry, 'id')
-        self.create_field("Name:", entry, 'name')
-        self.create_text_field("Description:", entry, 'description', height=3)
-        
-        # Content section (key-value pairs)
-        content_frame = ttk.LabelFrame(self.edit_frame, text="Content", padding=10)
-        content_frame.pack(fill=tk.BOTH, padx=10, pady=10)
-        
-        if 'content' not in entry:
-            entry['content'] = {}
-        
-        # Display existing content
-        for key in list(entry['content'].keys()):
-            self.create_content_row(content_frame, entry, key)
-        
-        # Add content button
-        ttk.Button(content_frame, text="+ Add Content Field", 
-                  command=lambda: self.add_content_field(content_frame, entry)).pack(anchor=tk.W, pady=5)
-        
-        # Examples section
-        examples_frame = ttk.LabelFrame(self.edit_frame, text="Examples", padding=10)
-        examples_frame.pack(fill=tk.BOTH, padx=10, pady=10)
-        
-        if 'examples' not in entry:
-            entry['examples'] = []
-        
-        for idx, example in enumerate(entry['examples']):
-            self.create_example_row(examples_frame, entry, idx)
-        
-        ttk.Button(examples_frame, text="+ Add Example", 
-                  command=lambda: self.add_example(examples_frame, entry)).pack(anchor=tk.W, pady=5)
-        
-        # Details section
-        details_frame = ttk.LabelFrame(self.edit_frame, text="Details", padding=10)
-        details_frame.pack(fill=tk.BOTH, padx=10, pady=10)
-        
-        if 'details' not in entry:
-            entry['details'] = []
-        
-        for idx, detail in enumerate(entry['details']):
-            self.create_detail_row(details_frame, entry, idx)
-        
-        ttk.Button(details_frame, text="+ Add Detail", 
-                  command=lambda: self.add_detail(details_frame, entry)).pack(anchor=tk.W, pady=5)
-        
-        # Notes
-        self.create_text_field("Notes:", entry, 'notes', height=3)
-    
-    def create_field(self, label, data_dict, key, parent=None):
-        """Create a simple text field"""
-        if parent is None:
-            parent = self.edit_frame
-        
-        frame = ttk.Frame(parent)
-        frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        ttk.Label(frame, text=label, width=15).pack(side=tk.LEFT)
-        
-        var = tk.StringVar(value=data_dict.get(key, ''))
-        entry = ttk.Entry(frame, textvariable=var)
-        entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        
-        # Update data on change
-        var.trace('w', lambda *args: data_dict.update({key: var.get()}))
-    
-    def create_text_field(self, label, data_dict, key, height=5, parent=None):
-        """Create a text area field"""
-        if parent is None:
-            parent = self.edit_frame
-        
-        frame = ttk.LabelFrame(parent, text=label, padding=5)
-        frame.pack(fill=tk.X, padx=10, pady=5)
-        
-        text = tk.Text(frame, height=height, wrap=tk.WORD)
-        text.pack(fill=tk.BOTH, expand=True)
-        text.insert('1.0', data_dict.get(key, ''))
-        
-        # Update data on change
-        def update_text(*args):
-            data_dict[key] = text.get('1.0', 'end-1c')
-        
-        text.bind('<KeyRelease>', update_text)
-    
-    def create_content_row(self, parent, entry, key):
-        """Create a row for content key-value pair"""
-        frame = ttk.Frame(parent)
-        frame.pack(fill=tk.X, pady=2)
-        
-        key_var = tk.StringVar(value=key)
-        value_var = tk.StringVar(value=entry['content'][key])
-        
-        ttk.Label(frame, text="Key:").pack(side=tk.LEFT)
-        key_entry = ttk.Entry(frame, textvariable=key_var, width=15)
-        key_entry.pack(side=tk.LEFT, padx=5)
-        
-        ttk.Label(frame, text="Value:").pack(side=tk.LEFT)
-        value_entry = ttk.Entry(frame, textvariable=value_var)
-        value_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        
-        # Update on change
-        def update_content(*args):
-            new_key = key_var.get()
-            if new_key != key and key in entry['content']:
-                del entry['content'][key]
-            entry['content'][new_key] = value_var.get()
-        
-        key_var.trace('w', update_content)
-        value_var.trace('w', update_content)
-        
-        ttk.Button(frame, text="×", width=3, 
-                  command=lambda: self.remove_content(parent, entry, key, frame)).pack(side=tk.LEFT)
-    
-    def add_content_field(self, parent, entry):
-        """Add new content field"""
-        key = f"field_{len(entry['content']) + 1}"
-        entry['content'][key] = ""
-        self.create_content_row(parent, entry, key)
-    
-    def remove_content(self, parent, entry, key, frame):
-        """Remove content field"""
-        if key in entry['content']:
-            del entry['content'][key]
-        frame.destroy()
-    
-    def create_example_row(self, parent, entry, idx):
-        """Create a row for an example"""
-        frame = ttk.LabelFrame(parent, text=f"Example {idx + 1}", padding=5)
-        frame.pack(fill=tk.X, pady=5)
-        
-        example = entry['examples'][idx]
-        
-        # Handle both string and dict formats
-        if isinstance(example, str):
-            example = {"command": example, "description": ""}
-            entry['examples'][idx] = example
-        
-        # Command
-        cmd_frame = ttk.Frame(frame)
-        cmd_frame.pack(fill=tk.X, pady=2)
-        ttk.Label(cmd_frame, text="Command:").pack(side=tk.LEFT)
-        cmd_var = tk.StringVar(value=example.get('command', ''))
-        cmd_entry = ttk.Entry(cmd_frame, textvariable=cmd_var)
-        cmd_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        cmd_var.trace('w', lambda *args: example.update({'command': cmd_var.get()}))
-        
-        # Description
-        desc_frame = ttk.Frame(frame)
-        desc_frame.pack(fill=tk.X, pady=2)
-        ttk.Label(desc_frame, text="Description:").pack(side=tk.LEFT)
-        desc_var = tk.StringVar(value=example.get('description', ''))
-        desc_entry = ttk.Entry(desc_frame, textvariable=desc_var)
-        desc_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        desc_var.trace('w', lambda *args: example.update({'description': desc_var.get()}))
-        
-        # Remove button
-        ttk.Button(frame, text="Remove Example", 
-                  command=lambda: self.remove_example(parent, entry, idx, frame)).pack(anchor=tk.E, pady=2)
-    
-    def add_example(self, parent, entry):
-        """Add new example"""
-        entry['examples'].append({"command": "", "description": ""})
-        self.create_example_row(parent, entry, len(entry['examples']) - 1)
-    
-    def remove_example(self, parent, entry, idx, frame):
-        """Remove example"""
-        if idx < len(entry['examples']):
-            entry['examples'].pop(idx)
-        frame.destroy()
-        # Refresh to update indices
-        for widget in parent.winfo_children():
-            if isinstance(widget, ttk.LabelFrame):
-                widget.destroy()
-        for i, example in enumerate(entry['examples']):
-            self.create_example_row(parent, entry, i)
-    
-    def create_detail_row(self, parent, entry, idx):
-        """Create a row for a detail"""
-        frame = ttk.Frame(parent)
-        frame.pack(fill=tk.X, pady=2)
-        
-        detail = entry['details'][idx]
-        
-        ttk.Label(frame, text="Label:").pack(side=tk.LEFT)
-        label_var = tk.StringVar(value=detail.get('label', ''))
-        label_entry = ttk.Entry(frame, textvariable=label_var, width=20)
-        label_entry.pack(side=tk.LEFT, padx=5)
-        label_var.trace('w', lambda *args: detail.update({'label': label_var.get()}))
-        
-        ttk.Label(frame, text="Value:").pack(side=tk.LEFT)
-        value_var = tk.StringVar(value=detail.get('value', ''))
-        value_entry = ttk.Entry(frame, textvariable=value_var)
-        value_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-        value_var.trace('w', lambda *args: detail.update({'value': value_var.get()}))
-        
-        ttk.Button(frame, text="×", width=3,
-                  command=lambda: self.remove_detail(parent, entry, idx, frame)).pack(side=tk.LEFT)
-    
-    def add_detail(self, parent, entry):
-        """Add new detail"""
-        entry['details'].append({"label": "", "value": ""})
-        self.create_detail_row(parent, entry, len(entry['details']) - 1)
-    
-    def remove_detail(self, parent, entry, idx, frame):
-        """Remove detail"""
-        if idx < len(entry['details']):
-            entry['details'].pop(idx)
-        frame.destroy()
-    
-    def show_context_menu(self, event):
-        """Show context menu on right-click"""
-        item = self.tree.identify_row(event.y)
-        if not item:
-            return
-        
-        self.tree.selection_set(item)
-        values = self.tree.item(item, 'values')
-        
-        # Create context menu dynamically
-        context_menu = tk.Menu(self.tree, tearoff=0)
-        
-        if not values or values[0] == 'sysmanual':
-            # Root sysmanual - only allow adding category
-            context_menu.add_command(label="Add Category", command=self.add_category)
-        elif values[0] == 'category':
-            # Category node
-            context_menu.add_command(label="Add Entry", command=self.add_entry)
-            context_menu.add_separator()
-            context_menu.add_command(label="Move Up ↑", command=self.move_item_up)
-            context_menu.add_command(label="Move Down ↓", command=self.move_item_down)
-            context_menu.add_separator()
-            context_menu.add_command(label="Delete Category", command=self.delete_item)
-        elif values[0] == 'entry':
-            # Entry node
-            context_menu.add_command(label="Move Up ↑", command=self.move_item_up)
-            context_menu.add_command(label="Move Down ↓", command=self.move_item_down)
-            context_menu.add_separator()
-            context_menu.add_command(label="Delete Entry", command=self.delete_item)
-        
-        context_menu.post(event.x_root, event.y_root)
-    
-    def add_category(self):
-        """Add new category"""
-        if not self.current_sysmanual:
-            return
-        
-        category = {
-            "id": f"category_{len(self.current_sysmanual['categories']) + 1}",
-            "name": "New Category",
-            "entries": []
-        }
-        self.current_sysmanual['categories'].append(category)
-        self.populate_tree()
-    
-    def add_entry(self, cat_idx=None):
-        """Add new entry"""
-        if not self.current_sysmanual:
-            return
-        
-        # If no category specified, use selected one
-        if cat_idx is None:
-            selection = self.tree.selection()
-            if not selection:
-                return
-            
-            values = self.tree.item(selection[0], 'values')
-            if not values or values[0] not in ['category', 'entry']:
-                return
-            
-            cat_idx = int(values[1])
-        
-        category = self.current_sysmanual['categories'][cat_idx]
-        entry = {
-            "id": f"entry_{len(category['entries']) + 1}",
-            "name": "New Entry",
-            "description": "Description",
-            "content": {},
-            "examples": [],
-            "details": [],
-            "notes": ""
-        }
-        category['entries'].append(entry)
-        self.populate_tree()
-    
-    def delete_item(self):
-        """Delete selected item"""
-        selection = self.tree.selection()
-        if not selection:
-            return
-        
-        values = self.tree.item(selection[0], 'values')
-        if not values:
-            return
-        
-        item_type = values[0]
-        
-        if item_type == 'sysmanual':
-            return
-        
-        if not messagebox.askyesno("Confirm Delete", f"Delete this {item_type}?"):
-            self.window.lift()
-            self.window.focus_force()
-            return
-        
-        if item_type == 'category':
-            cat_idx = int(values[1])
-            self.current_sysmanual['categories'].pop(cat_idx)
-        elif item_type == 'entry':
-            cat_idx = int(values[1])
-            entry_idx = int(values[2])
-            self.current_sysmanual['categories'][cat_idx]['entries'].pop(entry_idx)
-        
-        self.populate_tree()
-        self.clear_edit_panel()
-    
-    def move_item_up(self):
-        """Move selected item up in the list"""
-        selection = self.tree.selection()
-        if not selection:
-            return
-        
-        values = self.tree.item(selection[0], 'values')
-        if not values:
-            return
-        
-        item_type = values[0]
-        
-        if item_type == 'sysmanual':
-            return
-        
-        if item_type == 'category':
-            cat_idx = int(values[1])
-            if cat_idx == 0:
-                return
-            
-            # Swap with previous
-            categories = self.current_sysmanual['categories']
-            categories[cat_idx], categories[cat_idx - 1] = categories[cat_idx - 1], categories[cat_idx]
-            
-        elif item_type == 'entry':
-            cat_idx = int(values[1])
-            entry_idx = int(values[2])
-            if entry_idx == 0:
-                return
-            
-            # Swap with previous
-            entries = self.current_sysmanual['categories'][cat_idx]['entries']
-            entries[entry_idx], entries[entry_idx - 1] = entries[entry_idx - 1], entries[entry_idx]
-        
-        self.populate_tree()
-        # Try to reselect the moved item
-        self.select_item_after_move(item_type, values, -1)
-    
-    def move_item_down(self):
-        """Move selected item down in the list"""
-        selection = self.tree.selection()
-        if not selection:
-            return
-        
-        values = self.tree.item(selection[0], 'values')
-        if not values:
-            return
-        
-        item_type = values[0]
-        
-        if item_type == 'sysmanual':
-            return
-        
-        if item_type == 'category':
-            cat_idx = int(values[1])
-            categories = self.current_sysmanual['categories']
-            if cat_idx >= len(categories) - 1:
-                return
-            
-            # Swap with next
-            categories[cat_idx], categories[cat_idx + 1] = categories[cat_idx + 1], categories[cat_idx]
-            
-        elif item_type == 'entry':
-            cat_idx = int(values[1])
-            entry_idx = int(values[2])
-            entries = self.current_sysmanual['categories'][cat_idx]['entries']
-            if entry_idx >= len(entries) - 1:
-                return
-            
-            # Swap with next
-            entries[entry_idx], entries[entry_idx + 1] = entries[entry_idx + 1], entries[entry_idx]
-        
-        self.populate_tree()
-        # Try to reselect the moved item
-        self.select_item_after_move(item_type, values, 1)
-    
-    def select_item_after_move(self, item_type, old_values, direction):
-        """Reselect item after moving it"""
-        if item_type == 'category':
-            new_idx = int(old_values[1]) + direction
-            # Find the item in tree with matching values
-            for item in self.tree.get_children(self.tree.get_children()[0]):
-                if self.tree.item(item, 'values') == ('category', new_idx):
-                    self.tree.selection_set(item)
-                    self.tree.see(item)
-                    break
-        elif item_type == 'entry':
-            cat_idx = int(old_values[1])
-            new_entry_idx = int(old_values[2]) + direction
-            # Find category first
-            root = self.tree.get_children()[0]
-            categories = self.tree.get_children(root)
-            if cat_idx < len(categories):
-                cat_item = categories[cat_idx]
-                # Find entry
-                for entry_item in self.tree.get_children(cat_item):
-                    if self.tree.item(entry_item, 'values') == ('entry', cat_idx, new_entry_idx):
-                        self.tree.selection_set(entry_item)
-                        self.tree.see(entry_item)
-                        break
-    
-    def save_sysmanual(self):
-        """Save the current sysmanual"""
-        if not self.current_sysmanual:
-            return
-        
-        if not self.framework.validate_sysmanual(self.current_sysmanual):
-            self.window.lift()
-            self.window.focus_force()
-            return
-        
-        # Keep reference to editor window
-        editor_window = self.window
-        
-        filepath = filedialog.asksaveasfilename(
-            title="Save SysManual",
-            defaultextension=".json",
-            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
-            initialdir=Path("sysmanuals") if Path("sysmanuals").exists() else Path.cwd(),
-            initialfile=f"{self.current_sysmanual['id']}_sysmanual.json",
-            parent=self.window
-        )
-        
-        # Immediately restore focus after file dialog
-        editor_window.lift()
-        editor_window.focus_force()
-        
-        if filepath:
-            try:
-                with open(filepath, 'w', encoding='utf-8') as f:
-                    json.dump(self.current_sysmanual, f, indent=2)
-                
-                # Just reload the data in framework without triggering any UI updates
-                self.framework.load_sysmanual_file(filepath)
-                
-                # Update combo box options
-                self.load_combo['values'] = list(self.framework.sysmanuals.keys())
-                
-                # Keep focus
-                editor_window.lift()
-                editor_window.focus_force()
-                
-            except Exception as e:
-                messagebox.showerror("Save Error", f"Failed to save:\n{str(e)}")
-                editor_window.lift()
-                editor_window.focus_force()
-
 def main():
     root = tk.Tk()
     app = SysManualFramework(root)
