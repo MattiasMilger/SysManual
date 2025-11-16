@@ -6,11 +6,13 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import jsonschema
 from jsonschema import validate
+import re
+from difflib import SequenceMatcher
 
 class SysManualFramework:
     def __init__(self, root):
         self.root = root
-        self.root.title("SysManual Framework")
+        self.root.title("SysManual")
         self.root.geometry("1200x800")
         
         # Data storage
@@ -190,6 +192,7 @@ class SysManualFramework:
         # Search
         ttk.Label(toolbar, text="Search:").pack(side=tk.LEFT, padx=(20, 5))
         self.search_var = tk.StringVar()
+        # when search_var changes, call filter_entries() (treated as non-category call)
         self.search_var.trace('w', lambda *args: self.filter_entries())
         search_entry = ttk.Entry(toolbar, textvariable=self.search_var, width=30)
         search_entry.pack(side=tk.LEFT, padx=5)
@@ -231,27 +234,156 @@ class SysManualFramework:
         entries_frame.pack(fill=tk.BOTH, expand=True)
         
         # Scrollable canvas for entries
-        canvas = tk.Canvas(entries_frame)
-        scrollbar = ttk.Scrollbar(entries_frame, orient="vertical", command=canvas.yview)
-        self.entries_container = ttk.Frame(canvas)
+        self.entries_canvas = tk.Canvas(entries_frame)
+        scrollbar = ttk.Scrollbar(entries_frame, orient="vertical", command=self.entries_canvas.yview)
+        self.entries_container = ttk.Frame(self.entries_canvas)
         
         self.entries_container.bind(
             "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+            lambda e: self.entries_canvas.configure(scrollregion=self.entries_canvas.bbox("all"))
         )
         
-        canvas.create_window((0, 0), window=self.entries_container, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
+        self.entries_canvas.create_window((0, 0), window=self.entries_container, anchor="nw")
+        self.entries_canvas.configure(yscrollcommand=scrollbar.set)
         
-        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.entries_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
         # Bind mousewheel to root window for scrolling anywhere
         def on_mousewheel(e):
-            canvas.yview_scroll(int(-1*(e.delta/120)), "units")
+            self.entries_canvas.yview_scroll(int(-1*(e.delta/120)), "units")
         
         self.root.bind("<MouseWheel>", on_mousewheel)
-    
+
+    # ---------------------------
+    # Search utilities
+    # ---------------------------
+    def tokenize(self, text: str) -> List[str]:
+        """Split text into lowercase word tokens."""
+        if not text:
+            return []
+        tokens = re.findall(r"\w+", text.lower())
+        return tokens
+
+    def best_match_score_for_token(self, token: str, text: str) -> float:
+        """Return best match score in [0.0, 1.0] for token vs text.
+        Uses exact match, substring, and fuzzy (SequenceMatcher) across words.
+        """
+        if not token or not text:
+            return 0.0
+        token = token.lower()
+        text_l = text.lower()
+        
+        # Fast checks
+        if token == text_l:
+            return 1.0
+        if token in text_l:
+            # if token is substring of the entire text, good boost
+            return 0.6
+        
+        # Compare with individual words to get best fuzzy match
+        words = re.findall(r"\w+", text_l)
+        best = 0.0
+        for w in words:
+            if not w:
+                continue
+            if token == w:
+                return 1.0
+            if token in w or w in token:
+                # partial match inside a word
+                best = max(best, 0.7)
+                continue
+            ratio = SequenceMatcher(None, token, w).ratio()
+            if ratio > best:
+                best = ratio
+        # Cap fuzzy minimum impact
+        return best * 0.9  # scale slightly down to prefer exact/substring
+
+    def score_entry(self, entry: dict, tokens: List[str]) -> float:
+        """Compute normalized relevance score for an entry given tokens.
+        Higher is better; 0 means no match.
+        Field weights:
+          - name: 3.0
+          - description: 1.8
+          - content: 1.5
+          - examples: 1.2
+          - notes: 1.0
+        Normalization divides by (len(tokens) * sum(weights)) so results are in ~[0,1].
+        """
+        if not tokens:
+            return 1.0  # empty query => full score
+
+        # Prepare searchable text fragments
+        name_text = entry.get('name', '') or ''
+        desc_text = entry.get('description', '') or ''
+        # content may be dict; join values
+        content_val = ''
+        if isinstance(entry.get('content'), dict):
+            content_val = " ".join(str(v) for v in entry['content'].values())
+        else:
+            content_val = str(entry.get('content') or '')
+        # examples can be list of str or dicts
+        examples_val = ''
+        if isinstance(entry.get('examples'), list):
+            ex_parts = []
+            for ex in entry['examples']:
+                if isinstance(ex, str):
+                    ex_parts.append(ex)
+                elif isinstance(ex, dict):
+                    ex_parts.append(str(ex.get('command', '')))
+                    ex_parts.append(str(ex.get('description', '')))
+            examples_val = " ".join(ex_parts)
+        notes_text = entry.get('notes', '') or ''
+
+        # Weights
+        weights = {
+            'name': 3.0,
+            'description': 1.8,
+            'content': 1.5,
+            'examples': 1.2,
+            'notes': 1.0
+        }
+        max_weight_sum = sum(weights.values())
+
+        raw_score = 0.0
+        for token in tokens:
+            # compute best match per field for this token
+            raw_score += self.best_match_score_for_token(token, name_text) * weights['name']
+            raw_score += self.best_match_score_for_token(token, desc_text) * weights['description']
+            raw_score += self.best_match_score_for_token(token, content_val) * weights['content']
+            raw_score += self.best_match_score_for_token(token, examples_val) * weights['examples']
+            raw_score += self.best_match_score_for_token(token, notes_text) * weights['notes']
+
+        # Normalize by (num_tokens * max_weight_sum)
+        normalized = raw_score / (len(tokens) * max_weight_sum)
+        return normalized
+
+    def search_entries_in_category(self, entries: List[dict], query: str, min_score: float = 0.12) -> List[dict]:
+        """Return entries matching query ordered by relevance.
+        min_score is the threshold for normalized score to include an entry.
+        """
+        query = (query or "").strip()
+        if not query:
+            # empty -> return all entries (keep original order)
+            return entries.copy()
+
+        tokens = self.tokenize(query)
+        if not tokens:
+            return entries.copy()
+
+        scored = []
+        for entry in entries:
+            score = self.score_entry(entry, tokens)
+            if score >= min_score:
+                scored.append((score, entry))
+        # sort by descending score
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [e for s, e in scored]
+
+    # ---------------------------
+    # End search utilities
+    # ---------------------------
+
     def switch_sysmanual(self, sysmanual_id: str):
         """Switch to a different sysmanual"""
         if sysmanual_id not in self.sysmanuals:
@@ -273,7 +405,8 @@ class SysManualFramework:
         if sysmanual['categories']:
             self.category_listbox.selection_set(0)
             self.current_category = sysmanual['categories'][0]['id']
-            self.display_entries()
+            # indicate this display is from a category switch so scroll resets
+            self.display_entries(from_category=True)
     
     def on_category_select(self, event):
         """Handle category selection"""
@@ -284,31 +417,56 @@ class SysManualFramework:
         sysmanual = self.sysmanuals[self.current_sysmanual]
         category_idx = selection[0]
         self.current_category = sysmanual['categories'][category_idx]['id']
-        self.display_entries()
+        # indicate this display is from a category switch so scroll resets
+        self.display_entries(from_category=True)
     
-    def display_entries(self):
-        """Display entries for current category"""
+    def display_entries(self, from_category: bool = False):
+        """Display entries for current category
+        
+        from_category: if True, called due to category change -> reset scroll top.
+                       if False, treat as search/filter -> preserve scroll.
+        """
         # Clear existing entries
         for widget in self.entries_container.winfo_children():
             widget.destroy()
         
         if not self.current_sysmanual or not self.current_category:
+            if from_category and hasattr(self, "entries_canvas"):
+                try:
+                    self.entries_canvas.yview_moveto(0)
+                except Exception:
+                    pass
             return
         
         sysmanual = self.sysmanuals[self.current_sysmanual]
         category = next((c for c in sysmanual['categories'] if c['id'] == self.current_category), None)
         
         if not category:
+            if from_category and hasattr(self, "entries_canvas"):
+                try:
+                    self.entries_canvas.yview_moveto(0)
+                except Exception:
+                    pass
             return
         
-        search_term = self.search_var.get().lower()
+        search_term = (self.search_var.get() or "").strip()
         
-        for entry in category['entries']:
-            # Filter by search
-            if search_term and search_term not in entry['name'].lower() and search_term not in entry['description'].lower():
-                continue
-            
+        # If search term present, perform fuzzy/tokenized weighted search and get ordered results.
+        if search_term:
+            matched_entries = self.search_entries_in_category(category.get('entries', []), search_term)
+        else:
+            matched_entries = category.get('entries', [])
+        
+        # Create widgets for matched entries (ordered)
+        for entry in matched_entries:
             self.create_entry_widget(entry)
+        
+        # Reset scroll to top when called from a category switch (Option C)
+        if from_category and hasattr(self, "entries_canvas"):
+            try:
+                self.entries_canvas.yview_moveto(0)
+            except Exception:
+                pass
     
     def create_entry_widget(self, entry: dict):
         """Create a widget for an entry"""
@@ -393,7 +551,8 @@ class SysManualFramework:
     
     def filter_entries(self):
         """Filter entries based on search"""
-        self.display_entries()
+        # called by search_var trace; treat as not a category switch so do NOT reset scroll
+        self.display_entries(from_category=False)
     
     def copy_to_clipboard(self, text: str):
         """Copy text to clipboard"""
@@ -491,7 +650,7 @@ class SysManualGUIEditor:
             canvas.yview_scroll(int(-1*(e.delta/120)), "units")
         
         # Bind to multiple widgets to ensure scrolling works anywhere in edit panel
-        for widget in [canvas, self.edit_frame, right_frame]:
+        for widget in [canvas, self.edit_frame, parent]:
             widget.bind("<MouseWheel>", on_mousewheel)
         
         # Initial message
