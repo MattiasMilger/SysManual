@@ -3,11 +3,12 @@ from tkinter import ttk, messagebox, scrolledtext, filedialog
 import json
 import os
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 import jsonschema
 from jsonschema import validate
 import re
 from difflib import SequenceMatcher
+import copy # Added for deep copying
 
 class SysManualFramework:
     def __init__(self, root):
@@ -655,7 +656,71 @@ class SysManualGUIEditor:
         
         if framework.current_sysmanual:
             self.load_sysmanual(framework.current_sysmanual)
-    
+            
+    def _create_context_menu(self, widget, content_to_copy):
+        """Creates a right-click context menu for copying, primarily for text fields."""
+        menu = tk.Menu(widget, tearoff=0)
+
+        def copy_to_clipboard_full():
+            # Use the latest content from the widget if possible, otherwise use the initial passed content
+            try:
+                if isinstance(widget, ttk.Entry):
+                    current_content = widget.get()
+                elif isinstance(widget, tk.Text):
+                    current_content = widget.get('1.0', 'end-1c')
+                else:
+                    current_content = content_to_copy
+            except Exception:
+                current_content = content_to_copy
+                
+            self.framework.copy_to_clipboard(current_content)
+            
+        def copy_selection():
+            try:
+                # Attempt to get selected text from Entry or Text widget
+                if isinstance(widget, ttk.Entry):
+                    selected = widget.selection_get()
+                elif isinstance(widget, tk.Text):
+                    selected = widget.get(tk.SEL_FIRST, tk.SEL_LAST)
+                else:
+                    return # Not a copyable widget type
+                    
+                if selected:
+                    self.framework.copy_to_clipboard(selected)
+            except tk.TclError:
+                # No selection, copy full content instead
+                copy_to_clipboard_full()
+
+        menu.add_command(label="Copy", command=copy_selection)
+        menu.add_command(label="Copy All", command=copy_to_clipboard_full)
+
+        def show_menu(event):
+            try:
+                # Ensure the selection is updated right before showing the menu
+                if isinstance(widget, ttk.Entry):
+                    # For entry, try to focus and get selection info
+                    widget.focus_set()
+                elif isinstance(widget, tk.Text):
+                    # For text, just show the menu
+                    pass
+                    
+                menu.tk_popup(event.x_root, event.y_root)
+            finally:
+                menu.grab_release()
+
+        widget.bind("<Button-3>", show_menu)
+        
+        # Helper to ensure 'Copy' command works on selection for Text widgets
+        if isinstance(widget, tk.Text):
+             widget.bind("<<Selection>>", lambda e: menu.entryconfig("Copy", command=copy_selection))
+             widget.bind("<Button-1>", lambda e: menu.entryconfig("Copy", command=copy_selection))
+             
+        # For Entry widgets, use the widget's internal bindings
+        elif isinstance(widget, ttk.Entry):
+            widget.bind("<<Selection>>", lambda e: menu.entryconfig("Copy", command=copy_selection))
+            widget.bind("<Button-1>", lambda e: menu.entryconfig("Copy", command=copy_selection))
+
+
     def setup_toolbar(self):
         toolbar = ttk.Frame(self.window)
         toolbar.pack(fill=tk.X, padx=5, pady=5)
@@ -748,7 +813,6 @@ class SysManualGUIEditor:
     
     def load_sysmanual(self, sysmanual_id):
         if sysmanual_id in self.framework.sysmanuals:
-            import copy
             self.current_sysmanual = copy.deepcopy(self.framework.sysmanuals[sysmanual_id])
             self.populate_tree()
     
@@ -888,6 +952,11 @@ class SysManualGUIEditor:
         entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         
         var.trace('w', lambda *args: data_dict.update({key: var.get()}))
+        
+        # Add right-click copy for the Entry field
+        self._create_context_menu(entry, var.get())
+        
+        return entry
     
     def create_text_field(self, label, data_dict, key, height=5, parent=None):
         if parent is None:
@@ -904,7 +973,12 @@ class SysManualGUIEditor:
             data_dict[key] = text.get('1.0', 'end-1c')
         
         text.bind('<KeyRelease>', update_text)
-    
+        
+        # Add right-click copy for the Text field
+        self._create_context_menu(text, data_dict.get(key, ''))
+
+        return text
+
     def create_content_row(self, parent, entry, key):
         frame = ttk.Frame(parent)
         frame.pack(fill=tk.X, pady=2)
@@ -923,11 +997,20 @@ class SysManualGUIEditor:
         def update_content(*args):
             new_key = key_var.get()
             if new_key != key and key in entry['content']:
+                # Save the new key and value, then delete the old key
+                value_to_save = entry['content'][key]
                 del entry['content'][key]
-            entry['content'][new_key] = value_var.get()
+                entry['content'][new_key] = value_to_save
+                # This doesn't completely rebind the row, but handles the data update.
+            else:
+                entry['content'][new_key] = value_var.get()
         
         key_var.trace('w', update_content)
         value_var.trace('w', update_content)
+        
+        # Add right-click copy for the Content fields
+        self._create_context_menu(key_entry, key_var.get())
+        self._create_context_menu(value_entry, value_var.get())
         
         ttk.Button(frame, text="×", width=3, 
                   command=lambda: self.remove_content(parent, entry, key, frame)).pack(side=tk.LEFT)
@@ -938,8 +1021,10 @@ class SysManualGUIEditor:
         self.create_content_row(parent, entry, key)
     
     def remove_content(self, parent, entry, key, frame):
-        if key in entry['content']:
-            del entry['content'][key]
+        # We need to find the correct current key in the entry dict to delete
+        keys_to_delete = [k for k, v in entry['content'].items() if v == entry['content'][key]]
+        for k in keys_to_delete:
+            del entry['content'][k]
         frame.destroy()
     
     def create_example_row(self, parent, entry, idx):
@@ -959,6 +1044,7 @@ class SysManualGUIEditor:
         cmd_entry = ttk.Entry(cmd_frame, textvariable=cmd_var)
         cmd_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         cmd_var.trace('w', lambda *args: example.update({'command': cmd_var.get()}))
+        self._create_context_menu(cmd_entry, cmd_var.get())
         
         desc_frame = ttk.Frame(frame)
         desc_frame.pack(fill=tk.X, pady=2)
@@ -967,18 +1053,25 @@ class SysManualGUIEditor:
         desc_entry = ttk.Entry(desc_frame, textvariable=desc_var)
         desc_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         desc_var.trace('w', lambda *args: example.update({'description': desc_var.get()}))
+        self._create_context_menu(desc_entry, desc_var.get())
         
         ttk.Button(frame, text="Remove Example", 
                   command=lambda: self.remove_example(parent, entry, idx, frame)).pack(anchor=tk.E, pady=2)
     
     def add_example(self, parent, entry):
         entry['examples'].append({"command": "", "description": ""})
-        self.create_example_row(parent, entry, len(entry['examples']) - 1)
+        # Re-draw the examples to ensure idx is correct
+        for widget in parent.winfo_children():
+            if isinstance(widget, ttk.LabelFrame):
+                widget.destroy()
+        for i, example in enumerate(entry['examples']):
+            self.create_example_row(parent, entry, i)
     
     def remove_example(self, parent, entry, idx, frame):
         if idx < len(entry['examples']):
             entry['examples'].pop(idx)
         frame.destroy()
+        # Re-draw the examples to ensure idx is correct
         for widget in parent.winfo_children():
             if isinstance(widget, ttk.LabelFrame):
                 widget.destroy()
@@ -996,12 +1089,16 @@ class SysManualGUIEditor:
         label_entry = ttk.Entry(frame, textvariable=label_var, width=20)
         label_entry.pack(side=tk.LEFT, padx=5)
         label_var.trace('w', lambda *args: detail.update({'label': label_var.get()}))
+        self._create_context_menu(label_entry, label_var.get())
+
         
         ttk.Label(frame, text="Value:").pack(side=tk.LEFT)
         value_var = tk.StringVar(value=detail.get('value', ''))
         value_entry = ttk.Entry(frame, textvariable=value_var)
         value_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
         value_var.trace('w', lambda *args: detail.update({'value': value_var.get()}))
+        self._create_context_menu(value_entry, value_var.get())
+
         
         ttk.Button(frame, text="×", width=3,
                   command=lambda: self.remove_detail(parent, entry, idx, frame)).pack(side=tk.LEFT)
@@ -1015,6 +1112,115 @@ class SysManualGUIEditor:
             entry['details'].pop(idx)
         frame.destroy()
     
+    # --- New and Modified Methods for Duplication ---
+
+    def _get_unique_name_and_id(self, original_name: str, original_id: str, existing_ids: List[str]) -> Tuple[str, str]:
+        """Generates a new name and ID by appending a counter (e.g., (1) or _1) to avoid clashes."""
+        
+        def find_next_name_id(base_name, base_id, current_count):
+            new_name = f"{base_name} ({current_count})"
+            new_id = f"{base_id}_{current_count}"
+            return new_name, new_id
+
+        # Clean the original name and ID by removing existing (N) suffixes
+        # Name pattern: "Name (N)" -> "Name"
+        match_name = re.match(r"^(.*) \(\d+\)$", original_name)
+        base_name = match_name.group(1).strip() if match_name else original_name.strip()
+        
+        # ID pattern: "id_N" -> "id"
+        match_id = re.match(r"^(.*)_\d+$", original_id)
+        base_id = match_id.group(1).strip() if match_id else original_id.strip()
+
+        i = 1
+        while True:
+            new_name, new_id = find_next_name_id(base_name, base_id, i)
+            if new_id not in existing_ids:
+                return new_name, new_id
+            i += 1
+
+    def _process_duplicated_category(self, category_data: dict, existing_cat_ids: List[str]) -> dict:
+        """Deep copies a category and updates its ID, Name, and all child entry IDs/Names."""
+        new_category = copy.deepcopy(category_data)
+        
+        # 1. Update Category ID/Name
+        new_name, new_id = self._get_unique_name_and_id(new_category['name'], new_category['id'], existing_cat_ids)
+        new_category['name'] = new_name
+        new_category['id'] = new_id
+        
+        # 2. Update all child Entry IDs/Names
+        # Collect all existing *entry* IDs across the entire sysmanual to prevent clashes
+        all_entry_ids = set()
+        for cat in self.current_sysmanual.get('categories', []):
+            for entry in cat.get('entries', []):
+                all_entry_ids.add(entry['id'])
+        
+        # Now update the new entries
+        for entry in new_category.get('entries', []):
+            # Need to convert set to list for existing_ids argument
+            new_entry_name, new_entry_id = self._get_unique_name_and_id(entry['name'], entry['id'], list(all_entry_ids))
+            entry['name'] = new_entry_name
+            entry['id'] = new_entry_id
+            all_entry_ids.add(new_entry_id) # Add the new ID to the set to prevent clashes with subsequent entries
+            
+        return new_category
+
+    def _process_duplicated_entry(self, entry_data: dict) -> dict:
+        """Deep copies an entry and updates its ID and Name."""
+        new_entry = copy.deepcopy(entry_data)
+        
+        # 1. Collect all existing entry IDs in the whole sysmanual
+        all_entry_ids = set()
+        for cat in self.current_sysmanual.get('categories', []):
+            for entry in cat.get('entries', []):
+                all_entry_ids.add(entry['id'])
+
+        # 2. Update Entry ID/Name
+        new_name, new_id = self._get_unique_name_and_id(new_entry['name'], new_entry['id'], list(all_entry_ids))
+        new_entry['name'] = new_name
+        new_entry['id'] = new_id
+        
+        return new_entry
+        
+    def duplicate_category(self, cat_idx: int):
+        if not self.current_sysmanual:
+            return
+
+        categories = self.current_sysmanual['categories']
+        original_category = categories[cat_idx]
+        
+        existing_cat_ids = [c['id'] for c in categories]
+
+        new_category = self._process_duplicated_category(original_category, existing_cat_ids)
+        
+        # Insert the new category right after the original
+        categories.insert(cat_idx + 1, new_category)
+        
+        self.populate_tree()
+        
+        # Select the newly created category (index increases by 1)
+        self.select_item_after_move('category', ('category', cat_idx), 1)
+
+    def duplicate_entry(self, cat_idx: int, entry_idx: int):
+        if not self.current_sysmanual:
+            return
+        
+        category = self.current_sysmanual['categories'][cat_idx]
+        entries = category['entries']
+        original_entry = entries[entry_idx]
+
+        new_entry = self._process_duplicated_entry(original_entry)
+
+        # Insert the new entry right after the original
+        entries.insert(entry_idx + 1, new_entry)
+        
+        self.populate_tree()
+        
+        # Select the newly created entry (entry index increases by 1)
+        # We pass the original values and a direction of +1
+        self.select_item_after_move('entry', ('entry', cat_idx, entry_idx), 1)
+
+    # --- End New Duplication Methods ---
+
     def show_context_menu(self, event):
         item = self.tree.identify_row(event.y)
         if not item:
@@ -1028,13 +1234,19 @@ class SysManualGUIEditor:
         if not values or values[0] == 'sysmanual':
             context_menu.add_command(label="Add Category", command=self.add_category)
         elif values[0] == 'category':
-            context_menu.add_command(label="Add Entry", command=self.add_entry)
+            cat_idx = int(values[1])
+            context_menu.add_command(label="Add Entry", command=lambda: self.add_entry(cat_idx))
+            context_menu.add_command(label="Duplicate Category", command=lambda: self.duplicate_category(cat_idx)) # ADDED
             context_menu.add_separator()
             context_menu.add_command(label="Move Up ↑", command=self.move_item_up)
             context_menu.add_command(label="Move Down ↓", command=self.move_item_down)
             context_menu.add_separator()
             context_menu.add_command(label="Delete Category", command=self.delete_item)
         elif values[0] == 'entry':
+            cat_idx = int(values[1])
+            entry_idx = int(values[2])
+            context_menu.add_command(label="Duplicate Entry", command=lambda: self.duplicate_entry(cat_idx, entry_idx)) # ADDED
+            context_menu.add_separator()
             context_menu.add_command(label="Move Up ↑", command=self.move_item_up)
             context_menu.add_command(label="Move Down ↓", command=self.move_item_down)
             context_menu.add_separator()
@@ -1046,9 +1258,21 @@ class SysManualGUIEditor:
         if not self.current_sysmanual:
             return
         
+        # Get existing IDs for safe creation
+        existing_cat_ids = [c['id'] for c in self.current_sysmanual['categories']]
+        
+        base_id = "new-category"
+        base_name = "New Category"
+        
+        # Use the utility to find a unique name and id, starting the count from 1 if necessary
+        new_name, new_id = self._get_unique_name_and_id(base_name, base_id, existing_cat_ids)
+        # If the generated name/id does not contain a suffix, it means it's the first one, use base name/id
+        if not re.search(r" \(\d+\)$", new_name) and base_id not in existing_cat_ids:
+             new_name, new_id = base_name, base_id
+        
         category = {
-            "id": f"category_{len(self.current_sysmanual['categories']) + 1}",
-            "name": "New Category",
+            "id": new_id,
+            "name": new_name,
             "entries": []
         }
         self.current_sysmanual['categories'].append(category)
@@ -1070,16 +1294,33 @@ class SysManualGUIEditor:
             cat_idx = int(values[1])
         
         category = self.current_sysmanual['categories'][cat_idx]
+        entries = category['entries']
+        
+        # Get existing entry IDs for safe creation (across all categories)
+        all_entry_ids = set()
+        for cat in self.current_sysmanual.get('categories', []):
+            for entry in cat.get('entries', []):
+                all_entry_ids.add(entry['id'])
+        
+        base_id = "new-entry"
+        base_name = "New Entry"
+        
+        # Use the utility to find a unique name and id, starting the count from 1 if necessary
+        new_name, new_id = self._get_unique_name_and_id(base_name, base_id, list(all_entry_ids))
+        # If the generated name/id does not contain a suffix, it means it's the first one, use base name/id
+        if not re.search(r" \(\d+\)$", new_name) and base_id not in all_entry_ids:
+             new_name, new_id = base_name, base_id
+
         entry = {
-            "id": f"entry_{len(category['entries']) + 1}",
-            "name": "New Entry",
+            "id": new_id,
+            "name": new_name,
             "description": "Description",
             "content": {},
             "examples": [],
             "details": [],
             "notes": ""
         }
-        category['entries'].append(entry)
+        entries.append(entry)
         self.populate_tree()
     
     def delete_item(self):
