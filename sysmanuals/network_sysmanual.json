@@ -242,6 +242,23 @@
           "notes": "Always use HTTPS"
         },
         {
+          "id": "http-alt",
+          "name": "HTTP Alt - 8080/TCP",
+          "description": "Alternate port for HTTP traffic",
+          "content": {
+            "Port": "8080",
+            "Protocol": "TCP"
+          },
+          "examples": [
+            {
+              "command": "curl http://localhost:8080",
+              "description": "Access local web app (PowerShell / Linux)",
+              "shell": "PowerShell / Linux Bash"
+            }
+          ],
+          "notes": "Commonly used for testing, web proxies, and app servers (e.g., Tomcat) when port 80 is unavailable or restricted"
+        },
+        {
           "id": "database-ports",
           "name": "Database Ports",
           "description": "Common database server ports",
