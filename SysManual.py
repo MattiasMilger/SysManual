@@ -131,11 +131,11 @@ class SysManualFramework:
         # Open File button
         ttk.Button(toolbar, text="Open SysManual File", command=self.open_sysmanual_file).pack(side=tk.LEFT, padx=5)
 
+        # Editor button
+        ttk.Button(toolbar, text="SysManual Editor", command=self.open_gui_editor).pack(side=tk.RIGHT, padx=5)
+
         # Advanced Search button
         ttk.Button(toolbar, text="Advanced Search", command=self.open_advanced_search).pack(side=tk.RIGHT, padx=5)
-        
-        # Editor button
-        ttk.Button(toolbar, text="GUI Editor", command=self.open_gui_editor).pack(side=tk.RIGHT, padx=5)
         
         # Main content area
         content = ttk.Frame(self.root)
