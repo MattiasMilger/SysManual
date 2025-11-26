@@ -164,6 +164,42 @@
           "notes": "ipconfig on Windows, ip on Linux"
         },
         {
+          "id": "nmap",
+          "name": "nmap",
+          "description": "Network scanning, port discovery, and service fingerprinting",
+          "content": {
+            "Purpose": "Security auditing and network inventory",
+            "Protocols": "TCP, UDP, ICMP"
+          },
+          "examples": [
+            {
+              "command": "nmap 192.168.1.1",
+              "description": "Basic scan of common ports on a host",
+              "shell": "Windows CMD / Linux Bash"
+            },
+            {
+              "command": "nmap -p 1-65535 -sV 192.168.1.0/24",
+              "description": "Full port, version detection, subnet scan",
+              "shell": "Linux Bash"
+            }
+          ],
+          "details": [
+            {
+              "label": "-sS",
+              "value": "SYN Scan (Stealthiest)"
+            },
+            {
+              "label": "-sV",
+              "value": "Version Detection"
+            },
+            {
+              "label": "-A",
+              "value": "Aggressive Scan (OS detection, version detection, script scanning, and traceroute)"
+            }
+          ],
+          "notes": "Requires installation. Use ethically and on networks you own/have permission for."
+        },
+        {
           "id": "packet-capture",
           "name": "pktmon / tcpdump",
           "description": "Capture and analyze packets",
